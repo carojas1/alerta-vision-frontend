@@ -1,0 +1,28 @@
+<div class="container mt-5">
+  <h2 class="mb-3 text-center">Lista de Clientes AlertaVisión</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Sexo</th>
+        <th>Edad</th>
+        <th>Cédula</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of clientes">
+        <td>{{ c.nombre }}</td>
+        <td>{{ c.apellido }}</td>
+        <td>{{ c.sexo }}</td>
+        <td>{{ c.edad }}</td>
+        <td>{{ c.cedula }}</td>
+        <td>
+          <!-- Botón para editar podría ir aquí -->
+          <button (click)="eliminar(c.id!)" class="btn btn-sm btn-danger">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

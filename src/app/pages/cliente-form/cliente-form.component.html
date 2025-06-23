@@ -1,0 +1,15 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <input formControlName="nombre" placeholder="Nombre" />
+  <input formControlName="apellido" placeholder="Apellido" />
+  <select formControlName="sexo">
+    <option value="">Selecciona sexo</option>
+    <option value="masculino">Masculino</option>
+    <option value="femenino">Femenino</option>
+  </select>
+  <input type="date" formControlName="fechaNacimiento" (change)="onFechaChange()" />
+  <input formControlName="edad" placeholder="Edad" [disabled]="true" />
+  <input formControlName="cedula" placeholder="Cédula" />
+  <button type="submit" [disabled]="form.invalid">Guardar Cliente</button>
+</form>
+
+

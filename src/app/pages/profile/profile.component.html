@@ -1,0 +1,11 @@
+<div class="profile-container">
+  <h2>Perfil de usuario</h2>
+
+  <p *ngIf="user">
+    Bienvenido, <strong>{{ user.email }}</strong>
+  </p>
+
+  <p *ngIf="!user">No se pudo cargar el perfil.</p>
+
+  <button (click)="logout()">Cerrar sesión</button>
+</div>

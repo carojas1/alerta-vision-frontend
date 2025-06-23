@@ -1,0 +1,88 @@
+body, html {
+  font-family: 'Montserrat', Arial, sans-serif;
+  background: #fff;
+}
+
+.login-container {
+  max-width: 400px;
+  margin: 50px auto 0 auto;
+  background: #fffbea;
+  padding: 32px 28px 18px 28px;
+  border-radius: 15px;
+  box-shadow: 0 4px 28px 0 #0001;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.brand {
+  color: #181818;
+  font-weight: 800;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+input[type="email"],
+input[type="password"] {
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #ececec;
+  font-size: 1rem;
+  outline: none;
+  background: #fff;
+  margin-bottom: 0;
+}
+
+button[type="submit"] {
+  background: #ffd429;
+  color: #181818;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 13px 0;
+  font-size: 1.08rem;
+  margin-top: 6px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background: #ffcf02;
+}
+
+.error {
+  color: #f33;
+  font-size: 0.98rem;
+  margin: 10px 0 0 0;
+}
+
+.register-link {
+  font-size: 1rem;
+  margin-top: 14px;
+  color: #222;
+}
+
+.register-link a {
+  color: #181818;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.terms {
+  margin-top: 15px;
+  font-size: 0.92rem;
+  color: #555;
+}
+
+.terms a {
+  color: #181818;
+  text-decoration: underline;
+}

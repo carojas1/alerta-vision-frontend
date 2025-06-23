@@ -1,0 +1,17 @@
+<div class="register-container">
+  <h2>Regístrate en <span class="brand">AlertaVisión</span></h2>
+  <form (ngSubmit)="onSubmit()">
+    <input type="text" [(ngModel)]="nombre" name="nombre" placeholder="Nombre" required>
+    <input type="email" [(ngModel)]="email" name="email" placeholder="Correo electrónico" required>
+    <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required>
+    <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Confirmar contraseña" required>
+    <button type="submit">Registrarse</button>
+    <p *ngIf="error" class="error">{{ error }}</p>
+  </form>
+  <span>
+    ¿Ya tienes una cuenta?
+    <a [routerLink]="['/login']" style="font-weight:bold; text-decoration:underline; cursor:pointer;">
+      Inicia sesión aquí
+    </a>
+  </span>
+</div>
