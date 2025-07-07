@@ -1,34 +1,37 @@
 <div class="login-container">
-  <h2>
-    Inicia sesión en <span class="brand">AlertaVisión</span>
-  </h2>
-  <form (ngSubmit)="onLogin()">
+  <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form">
+    <img src="src/assets/logo-alertavision.png" alt= />
+
+    <h2>Inicia sesión en <span class="brand">AlertaVisión</span></h2>
+
     <input
       type="email"
-      [(ngModel)]="email"
       name="email"
+      [(ngModel)]="email"
       placeholder="Correo electrónico"
       required
     />
+
     <input
       type="password"
-      [(ngModel)]="password"
       name="password"
+      [(ngModel)]="password"
       placeholder="Contraseña"
       required
     />
-    <button type="submit">Ingresar</button>
-    <p *ngIf="error" class="error">{{ error }}</p>
-  </form>
-  <div class="register-link" style="margin-top: 1rem;">
-    ¿No tienes una cuenta?
-    <a [routerLink]="['/register']" style="font-weight:bold; text-decoration:underline; cursor:pointer;">
-      Regístrate aquí
-    </a>
-  </div>
-  <div class="terms" style="margin-top: 1rem; font-size: 0.9em; color: #666;">
-    Al iniciar sesión, aceptas nuestras <a href="#">Condiciones</a> y <a href="#">Política de privacidad</a>.<br />
-    Podemos enviarte notificaciones.
-  </div>
-</div>
 
+    <button type="submit">Ingresar</button>
+
+    <p class="register-text">
+      ¿No tienes una cuenta?
+      <a routerLink="/register">Regístrate aquí</a>
+    </p>
+
+    <small class="terms">
+      Al iniciar sesión, aceptas nuestras
+      <a href="#">Condiciones</a> y
+      <a href="#">Política de privacidad</a>.<br />
+      Podemos enviarte notificaciones.
+    </small>
+  </form>
+</div>

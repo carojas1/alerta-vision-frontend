@@ -1,0 +1,50 @@
+<div class="home-main">
+  <header>
+    <span class="alerta-logo">AlertaVisión</span>
+  </header>
+
+  <section class="fatiga-box">
+    <div class="fatiga-label">Fatiga detectada</div>
+    <div class="fatiga-tip">Baje la velocidad</div>
+    <div class="fatiga-bar-bg">
+      <div class="fatiga-bar-fill" [style.width.%]="fatigaLevel"></div>
+    </div>
+  </section>
+
+  <section class="estado-box">
+    <div class="estado-label">Estado</div>
+    <div class="estado-valor">Despierto</div>
+    <div class="estado-sub">En tiempo real</div>
+    <div class="estado-graf">
+      <div class="estado-row">
+        <span class="estado-nombre despierto">Despierto</span>
+        <div class="estado-bar-bg">
+          <div class="estado-bar-fill" [style.width.%]="despiertoLevel"></div>
+        </div>
+      </div>
+      <div class="estado-row">
+        <span class="estado-nombre somnoliento">Somnoliento</span>
+        <div class="estado-bar-bg">
+          <div class="estado-bar-fill" [style.width.%]="somnolientoLevel"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <button class="alerta-btn">Pausar alertas</button>
+
+  <nav class="nav-bottom">
+    <div class="nav-btn active" (click)="goTo('home')">
+      <span class="material-icons">home</span>
+      <div>Inicio</div>
+    </div>
+    <div class="nav-btn" (click)="goTo('history')">
+      <span class="material-icons">history</span>
+      <div>Alertas</div>
+    </div>
+    <div class="nav-btn" (click)="goTo('reports')">
+      <span class="material-icons">analytics</span>
+      <div>Informes</div>
+    </div>
+  </nav>
+</div>

@@ -1,88 +1,83 @@
-body, html {
-  font-family: 'Montserrat', Arial, sans-serif;
-  background: #fff;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f6e2bb;
 }
 
 .login-container {
-  max-width: 400px;
-  margin: 50px auto 0 auto;
-  background: #fffbea;
-  padding: 32px 28px 18px 28px;
-  border-radius: 15px;
-  box-shadow: 0 4px 28px 0 #0001;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f6e2bb;
+}
+
+.login-form {
+  background-color: #fffaf0;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 380px;
   text-align: center;
 }
 
+.logo {
+  width: 130px;
+  margin-bottom: 15px;
+}
+
 h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 24px;
+  font-size: 20px;
+  margin-bottom: 25px;
 }
 
 .brand {
-  color: #181818;
-  font-weight: 800;
+  color: #f5b400;
+  font-weight: bold;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
 }
 
-input[type="email"],
-input[type="password"] {
-  padding: 14px;
-  border-radius: 8px;
-  border: 1px solid #ececec;
-  font-size: 1rem;
-  outline: none;
-  background: #fff;
-  margin-bottom: 0;
-}
-
-button[type="submit"] {
-  background: #ffd429;
-  color: #181818;
-  font-weight: 600;
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #ffc107;
   border: none;
-  border-radius: 8px;
-  padding: 13px 0;
-  font-size: 1.08rem;
-  margin-top: 6px;
-  transition: background 0.2s;
+  border-radius: 6px;
+  font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-button[type="submit"]:hover {
-  background: #ffcf02;
+button:hover {
+  background-color: #e6b400;
 }
 
-.error {
-  color: #f33;
-  font-size: 0.98rem;
-  margin: 10px 0 0 0;
+.register-text {
+  margin-top: 10px;
+  font-size: 14px;
 }
 
-.register-link {
-  font-size: 1rem;
-  margin-top: 14px;
-  color: #222;
-}
-
-.register-link a {
-  color: #181818;
-  font-weight: 700;
-  text-decoration: underline;
+.register-text a {
+  color: #7b1fa2;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .terms {
   margin-top: 15px;
-  font-size: 0.92rem;
-  color: #555;
+  font-size: 11px;
+  color: #444;
 }
 
 .terms a {
-  color: #181818;
+  color: #0033cc;
   text-decoration: underline;
 }

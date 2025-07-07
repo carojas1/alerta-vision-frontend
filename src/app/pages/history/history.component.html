@@ -1,0 +1,27 @@
+<div class="history-main">
+  <header>
+    <span class="back-arrow" (click)="back()">&#8592;</span>
+    <span class="history-title">Alertas de somnolencia</span>
+  </header>
+
+  <div class="alert-list" [@listAnimation]>
+    <div class="alert-item" *ngFor="let alert of alerts" [@itemAnim]>
+      <span class="alert-icon">!</span>
+      <div class="alert-info">
+        <div class="alert-msg">{{ alert.message }}</div>
+        <div class="alert-time">{{ alert.time }}</div>
+      </div>
+      <span class="alert-next">&#8594;</span>
+    </div>
+  </div>
+
+  <nav class="nav-bottom">
+    <div class="nav-btn" (click)="goTo('home')">
+      <span class="material-icons">home</span>
+      <div>Inicio</div>
+    </div>
+    <div class="nav-btn active">
+      <span class="material-icons">history</span>
+      <div>Alertas</div>
+    </div>
+    

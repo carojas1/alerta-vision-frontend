@@ -1,0 +1,51 @@
+<div class="reports-main">
+  <header>
+    <span class="reports-title">Reportes</span>
+  </header>
+
+  <!-- Tabs -->
+  <div class="reports-tabs">
+    <button [class.active]="activeTab === 'diario'" (click)="selectTab('diario')">Diario</button>
+    <button [class.active]="activeTab === 'semanal'" (click)="selectTab('semanal')">Semanal</button>
+    <button [class.active]="activeTab === 'mensual'" (click)="selectTab('mensual')">Mensual</button>
+  </div>
+
+  <!-- Gráfica de barras -->
+  <div class="reports-card">
+    <div style="width: 100%; max-width: 350px; margin: 0 auto;">
+      <canvas
+        baseChart
+        [data]="barChartData"
+        [options]="barChartOptions"
+        type="bar"
+        style="height: 220px;">
+      </canvas>
+    </div>
+    <div class="average-box">
+      Somnolencia promedio:
+      <b>{{ getBarChartAverage() | number: '1.1-1' }}</b>
+      <small *ngIf="activeTab === 'diario'">Promedio diario</small>
+      <small *ngIf="activeTab === 'semanal'">Promedio semanal</small>
+      <small *ngIf="activeTab === 'mensual'">Promedio mensual</small>
+    </div>
+    <div class="export">
+      <span>Exportar datos:</span>
+      <a href="#">Enviar informe a su correo</a>
+    </div>
+
+  <!-- Footer tabs -->
+  <nav class="nav-bottom">
+    <div class="nav-btn" (click)="goTo('home')">
+      <span class="material-icons">home</span>
+      <div>Inicio</div>
+    </div>
+    <div class="nav-btn" (click)="goTo('history')">
+      <span class="material-icons">history</span>
+      <div>Alertas</div>
+    </div>
+    <div class="nav-btn active">
+      <span class="material-icons">analytics</span>
+      <div>Reportes</div>
+    </div>
+  </nav>
+</div>

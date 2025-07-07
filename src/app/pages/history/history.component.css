@@ -1,0 +1,128 @@
+body {
+  background: #fcf8ee;
+}
+
+.history-main {
+  min-height: 100vh;
+  background: #fcf8ee;
+  padding-bottom: 80px;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  padding: 20px 18px 10px 18px;
+}
+
+.back-arrow {
+  font-size: 1.6rem;
+  margin-right: 8px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.back-arrow:hover {
+  color: #cbb86a;
+}
+
+.history-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #211d14;
+}
+
+.alert-list {
+  padding: 8px 0 8px 0;
+}
+
+.alert-item {
+  background: #faf5e6;
+  border-radius: 16px;
+  margin: 15px 16px 0 16px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 3px 14px 0 #e7e2ce3c;
+  padding: 12px 16px;
+  transition: box-shadow 0.3s, transform 0.25s;
+  cursor: pointer;
+}
+.alert-item:hover {
+  box-shadow: 0 7px 26px 0 #e7e2ce89;
+  transform: translateY(-2px) scale(1.01);
+}
+
+.alert-icon {
+  background: #fcf8ee;
+  border-radius: 50%;
+  border: 2px solid #d3b660;
+  color: #d3b660;
+  font-weight: 600;
+  font-size: 1.3rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  box-shadow: 0 2px 7px #e6ddbb2d;
+}
+
+.alert-info {
+  flex: 1;
+}
+
+.alert-msg {
+  font-weight: 600;
+  color: #2c2416;
+  font-size: 1.08rem;
+  margin-bottom: 3px;
+}
+.alert-time {
+  color: #cca943;
+  font-size: 0.97rem;
+  font-weight: 400;
+}
+
+.alert-next {
+  font-size: 1.5rem;
+  color: #d3b660;
+  margin-left: 10px;
+}
+
+.nav-bottom {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: 70px;
+  background: #f9f4e9;
+  border-top: 1px solid #efe4ca;
+  display: flex;
+  justify-content: space-around;
+  align-items: end;
+  z-index: 100;
+  box-shadow: 0 0 30px #efe4ca41;
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.4rem;
+  padding: 7px 0 6px 0;
+  color: #c0b68e;
+  cursor: pointer;
+  font-weight: 400;
+  transition: color 0.2s;
+}
+.nav-btn.active, .nav-btn:hover {
+  color: #1a160e;
+  font-weight: 700;
+}
+.nav-btn .material-icons {
+  font-size: 1.7rem;
+}
+.nav-btn div {
+  font-size: 0.98rem;
+  margin-top: -2px;
+  letter-spacing: 0.5px;
+}
