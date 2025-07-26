@@ -6,22 +6,22 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private API_URL = 'http://localhost:3000'; // Cambia si usas Railway u otra cosa
+  apiUrl = 'https://backend2-7091.onrender.com';
 
   constructor(private http: HttpClient) {}
 
   register(nombre: string, email: string, password: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/register`, { nombre, email, password });
+    return this.http.post(`${this.apiUrl}/auth/register`, { nombre, email, password });
   }
 
   login(email: string, password: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/login`, { email, password });
+    return this.http.post(`${this.apiUrl}/auth/login`, { email, password });
   }
 
   getProfile(): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get(`${this.API_URL}/users/me`, { headers });
+    return this.http.get(`${this.apiUrl}/users/me`, { headers });
   }
 
   saveToken(token: string) {

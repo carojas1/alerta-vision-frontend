@@ -5,7 +5,10 @@
   </header>
 
   <div class="alert-list" [@listAnimation]>
-    <div class="alert-item" *ngFor="let alert of alerts" [@itemAnim]>
+    <div
+      class="alert-item"
+      *ngFor="let alert of alerts"
+      [@itemAnim]>
       <span class="alert-icon">!</span>
       <div class="alert-info">
         <div class="alert-msg">{{ alert.message }}</div>
@@ -18,10 +21,11 @@
   <nav class="nav-bottom">
     <div class="nav-btn" (click)="goTo('home')">
       <span class="material-icons">home</span>
-      <div>Inicio</div>
-    </div>
-    <div class="nav-btn active">
-      <span class="material-icons">history</span>
       <div>Alertas</div>
     </div>
-    
+    <div class="nav-btn active">
+      <span class="material-icons">analytics</span>
+      <div>Informes</div>
+    </div>
+  </nav>
+</div>

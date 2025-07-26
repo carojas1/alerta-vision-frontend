@@ -11,14 +11,18 @@ import { Router } from '@angular/router';
 
 // Guard para rutas protegidas
 const AuthGuard = () => {
-  const token = localStorage.getItem('token');
-  const router = inject(Router);
-  if (token) {
-    return true;
-  } else {
-    router.navigate(['/login']);
-    return false;
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    const token = localStorage.getItem('token');
+    const router = inject(Router);
+    if (token) {
+      return true;
+    } else {
+      router.navigate(['/login']);
+      return false;
+    }
   }
+  // Si está en SSR, bloquea acceso por seguridad
+  return false;
 };
 
 export const routes: Routes = [

@@ -1,81 +1,105 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgChartsModule } from 'ng2-charts';
-import { ChartConfiguration, ChartType } from 'chart.js';
 import { Router } from '@angular/router';
+import { ReportsService } from '../../services/reports.service';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
   imports: [CommonModule, NgChartsModule],
   templateUrl: './reports.component.html',
-  styleUrls: ['./reports.component.css']
+  styleUrls: ['./reports.component.css'],
 })
 export class ReportsComponent {
   activeTab: 'diario' | 'semanal' | 'mensual' = 'diario';
+  exportando = false;
 
-  // Datos de ejemplo
-  dailyData = [7, 8, 6, 5, 7, 9, 8];
-  weeklyData = [45, 48, 43, 39, 47, 50, 44];
-  monthlyData = [180, 210, 230, 220, 195, 205, 198, 200, 210, 190, 205, 220];
+  barChartData: any;
+  barChartOptions: any;
 
-  barChartData: ChartConfiguration<'bar'>['data'] = {
-    labels: [],
-    datasets: [{ data: [], label: 'Somnolencia', backgroundColor: '#d3bb97' }]
-  };
-  barChartOptions: ChartConfiguration<'bar'>['options'] = {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      title: { display: false }
-    },
-    scales: {
-      x: { grid: { display: false } },
-      y: { grid: { color: '#eee' } }
-    }
-  };
-  barChartType: ChartType = 'bar';  // <--- Esto es válido
+  mesesCortos = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  semanas = ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Semana 5', 'Semana 6'];
 
-  ngOnInit() {
-    this.setChartData('diario');
+  constructor(
+    private router: Router,
+    private reportsService: ReportsService
+  ) {
+    this.selectTab(this.activeTab); // Carga los datos iniciales
   }
 
   selectTab(tab: 'diario' | 'semanal' | 'mensual') {
     this.activeTab = tab;
-    this.setChartData(tab);
-  }
 
-  setChartData(tab: 'diario' | 'semanal' | 'mensual') {
-    let data, labels;
     if (tab === 'diario') {
-      data = this.dailyData;
-      labels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      this.barChartData = {
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        datasets: [
+          { data: [7, 5, 6, 8, 4, 7, 6], label: 'Somnolencia', backgroundColor: '#dec6a1' }
+        ]
+      };
     } else if (tab === 'semanal') {
-      data = this.weeklyData;
-      labels = ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Semana 5', 'Semana 6', 'Semana 7'];
-    } else {
-      data = this.monthlyData;
-      labels = [
-        'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
-        'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
-      ];
+      this.barChartData = {
+        labels: this.semanas,
+        datasets: [
+          { data: [41, 36, 33, 38, 44, 29], label: 'Somnolencia', backgroundColor: '#dec6a1' }
+        ]
+      };
+    } else if (tab === 'mensual') {
+      this.barChartData = {
+        labels: this.mesesCortos,
+        datasets: [
+          { data: [160, 143, 129, 156, 149, 172, 185, 144, 130, 153, 168, 175], label: 'Somnolencia', backgroundColor: '#dec6a1' }
+        ]
+      };
     }
-    this.barChartData = {
-      labels,
-      datasets: [{ data, label: 'Somnolencia', backgroundColor: '#d3bb97' }]
+
+    this.barChartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        title: { display: false }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#3d2b00',
+            font: { size: 14, weight: 'bold' }
+          }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: '#3d2b00',
+            font: { size: 14, weight: 'bold' }
+          }
+        }
+      }
     };
   }
 
-  getBarChartAverage(): number {
-    const dataArr = this.barChartData.datasets[0]?.data as number[];
-    if (!dataArr || !dataArr.length) return 0;
-    const sum = dataArr.reduce((a, b) => Number(a) + Number(b), 0);
-    return sum / dataArr.length;
+  getBarChartAverage() {
+    const arr = this.barChartData.datasets[0].data as number[];
+    if (!arr || arr.length === 0) return 0;
+    return arr.reduce((a, b) => a + b, 0) / arr.length;
   }
 
   goTo(ruta: string) {
     this.router.navigate([`/${ruta}`]);
   }
 
-  constructor(private router: Router) {}
+  exportarCorreo() {
+    this.exportando = true;
+    this.reportsService.exportarPorCorreo(this.activeTab).subscribe({
+      next: () => {
+        alert('¡Reporte enviado a tu correo!');
+        this.exportando = false;
+      },
+      error: () => {
+        alert('Error al enviar el reporte. Intenta más tarde.');
+        this.exportando = false;
+      }
+    });
+  }
 }

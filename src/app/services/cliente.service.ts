@@ -1,30 +1,30 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Cliente } from '../models/cliente.model'; // Asegúrate de tener este modelo
+import { Cliente } from '../models/cliente.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClienteService {
-  private API_URL = 'http://localhost:3000/clientes'; // Cambia si usas Railway
+  // CAMBIA aquí la URL por la de Render
+  apiUrl = 'https://backend2-7091.onrender.com';
 
-  // CORRECTO: usar español para coherencia en todo el código
+  constructor(private http: HttpClient) {}
+
   crearCliente(cliente: Cliente): Observable<Cliente> {
-    return this.http.post<Cliente>(this.API_URL, cliente);
+    return this.http.post<Cliente>(`${this.apiUrl}/clientes`, cliente);
   }
 
   getClientes(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(this.API_URL);
+    return this.http.get<Cliente[]>(`${this.apiUrl}/clientes`);
   }
 
   updateCliente(id: number, cliente: Cliente): Observable<Cliente> {
-    return this.http.put<Cliente>(`${this.API_URL}/${id}`, cliente);
+    return this.http.put<Cliente>(`${this.apiUrl}/clientes/${id}`, cliente);
   }
 
   eliminarCliente(id: number): Observable<any> {
-    return this.http.delete(`${this.API_URL}/${id}`);
+    return this.http.delete(`${this.apiUrl}/clientes/${id}`);
   }
-
-  constructor(private http: HttpClient) {}
 }

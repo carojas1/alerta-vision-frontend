@@ -10,30 +10,34 @@
     <button [class.active]="activeTab === 'mensual'" (click)="selectTab('mensual')">Mensual</button>
   </div>
 
-  <!-- Gráfica de barras -->
+  <!-- Card y gráfica -->
   <div class="reports-card">
-    <div style="width: 100%; max-width: 350px; margin: 0 auto;">
+    <div class="chart-container">
       <canvas
         baseChart
         [data]="barChartData"
         [options]="barChartOptions"
-        type="bar"
-        style="height: 220px;">
+        type="bar">
       </canvas>
     </div>
     <div class="average-box">
-      Somnolencia promedio:
-      <b>{{ getBarChartAverage() | number: '1.1-1' }}</b>
-      <small *ngIf="activeTab === 'diario'">Promedio diario</small>
-      <small *ngIf="activeTab === 'semanal'">Promedio semanal</small>
-      <small *ngIf="activeTab === 'mensual'">Promedio mensual</small>
+      <span>
+        Somnolencia promedio: 
+        <b>{{ getBarChartAverage() | number: '1.1-1' }}</b>
+        <small *ngIf="activeTab === 'diario'">Promedio diario</small>
+        <small *ngIf="activeTab === 'semanal'">Promedio semanal</small>
+        <small *ngIf="activeTab === 'mensual'">Promedio mensual</small>
+      </span>
     </div>
     <div class="export">
       <span>Exportar datos:</span>
-      <a href="#">Enviar informe a su correo</a>
+      <button (click)="exportarCorreo()" [disabled]="exportando">
+        {{ exportando ? 'Enviando...' : 'Enviar informe a su correo' }}
+      </button>
     </div>
+  </div>
 
-  <!-- Footer tabs -->
+  <!-- Footer -->
   <nav class="nav-bottom">
     <div class="nav-btn" (click)="goTo('home')">
       <span class="material-icons">home</span>

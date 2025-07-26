@@ -1,14 +1,23 @@
 :root {
-  --color-bg: #e6e2da;         /* Fondo más oscuro, elegante */
-  --color-black: #181818;      /* Barras y textos */
+  --color-bg: #e6e2da;
+  --color-black: #181818;
+  --color-texto: #5b4c3b;
+  --color-barra: #cbc7c0;
+  --color-sombra: #cbb87233;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body, html {
   background: var(--color-bg);
   font-family: 'Inter', Arial, Helvetica, sans-serif;
-  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
+/* Contenedor principal */
 .home-main {
   padding: 18px 0 88px 0;
   max-width: 430px;
@@ -19,6 +28,15 @@ body, html {
   box-shadow: 0 4px 40px #2222;
 }
 
+/* Logo centrado arriba */
+.logo-central {
+  display: block;
+  max-width: 220px;
+  margin: 24px auto 18px auto;
+  animation: aparecer 1s ease-in-out;
+}
+
+/* Header minimal */
 header {
   display: flex;
   justify-content: flex-end;
@@ -26,27 +44,35 @@ header {
   padding: 0 18px;
   margin-bottom: 28px;
 }
+
 .alerta-logo {
   font-size: 1.25rem;
   font-weight: bold;
   color: var(--color-black);
+  text-align: center;
+  width: 100%;
 }
 
+/* Caja de fatiga */
 .fatiga-box {
   margin: 10px 0 32px 0;
   padding: 0 18px;
 }
+
 .fatiga-label {
   font-weight: bold;
   font-size: 1.15rem;
   margin-bottom: 1px;
 }
+
 .fatiga-tip {
   font-size: 1rem;
   margin-bottom: 10px;
+  color: var(--color-texto);
 }
+
 .fatiga-bar-bg {
-  background: #cbc7c0;
+  background: var(--color-barra);
   height: 13px;
   width: 100%;
   border-radius: 13px;
@@ -55,8 +81,9 @@ header {
   position: relative;
   overflow: hidden;
 }
+
 .fatiga-bar-fill {
-  width: 57%;
+  width: 85%;
   height: 100%;
   background: var(--color-black) !important;
   border-radius: 10px;
@@ -66,40 +93,44 @@ header {
   transition: width 1s cubic-bezier(.77,0,.18,1);
 }
 
+/* Estado */
 .estado-box {
   padding: 0 18px;
 }
+
 .estado-label {
   font-size: 1.1rem;
   color: var(--color-black);
   margin-bottom: 4px;
 }
+
 .estado-valor {
   font-size: 2.6rem;
   font-weight: bold;
   color: var(--color-black);
   margin-bottom: 0px;
 }
+
 .estado-sub {
   color: #795d13;
   font-size: 1.15rem;
   margin-bottom: 16px;
 }
-.estado-graf {
-  margin-top: 0;
-}
+
 .estado-row {
   display: flex;
   align-items: center;
   margin-bottom: 15px;
 }
+
 .estado-nombre {
   font-weight: bold;
   color: var(--color-black);
   min-width: 110px;
 }
+
 .estado-bar-bg {
-  background: #cbc7c0;
+  background: var(--color-barra);
   height: 20px;
   width: 65%;
   border-radius: 10px;
@@ -108,6 +139,7 @@ header {
   overflow: hidden;
   box-shadow: 0 2px 10px #0002;
 }
+
 .estado-bar {
   border-radius: 10px;
   height: 100%;
@@ -120,6 +152,19 @@ header {
   box-shadow: 0 2px 8px #0006;
 }
 
+/* Frase motivacional */
+.frase-motivacional {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top: 28px;
+  color: var(--color-texto);
+  opacity: 0.85;
+  font-style: italic;
+  animation: aparecer 2s ease-in;
+}
+
+/* Botón principal */
 .alerta-btn {
   margin: 36px auto 0 auto;
   display: block;
@@ -131,14 +176,17 @@ header {
   border: none;
   font-weight: bold;
   font-size: 1.35rem;
-  box-shadow: 0 2px 18px #cbb87233;
+  box-shadow: 0 2px 18px var(--color-sombra);
   text-align: center;
   transition: background 0.2s;
+  animation: pulse 2.8s infinite ease-in-out;
 }
+
 .alerta-btn:active {
   background: #f1e9cf;
 }
 
+/* Navegación inferior */
 .nav-bottom {
   position: fixed;
   left: 0; right: 0; bottom: 0;
@@ -154,6 +202,7 @@ header {
   z-index: 20;
   box-shadow: 0 -8px 36px #b3aa9e33;
 }
+
 .nav-btn {
   display: flex;
   flex-direction: column;
@@ -166,9 +215,88 @@ header {
   user-select: none;
   transition: color 0.22s;
 }
-.nav-btn.active, .nav-btn:hover {
+
+.nav-btn.active,
+.nav-btn:hover {
   color: var(--color-black);
 }
+
 .material-icons {
   font-size: 2rem;
+}
+
+/* ---------------- ANIMACIONES ---------------- */
+
+@keyframes aparecer {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--color-sombra);
+  }
+  50% {
+    box-shadow: 0 0 12px 6px var(--color-sombra);
+  }
+}
+
+/* ---------------- RESPONSIVE ----------------- */
+
+@media (max-width: 430px) {
+  .home-main {
+    border-radius: 0;
+    padding: 12px 0 88px 0;
+    box-shadow: none;
+    width: 100%;
+  }
+
+  .alerta-logo {
+    font-size: 1.1rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  .fatiga-label,
+  .fatiga-tip,
+  .estado-label,
+  .estado-valor,
+  .estado-sub,
+  .estado-nombre {
+    font-size: 0.95rem;
+  }
+
+  .fatiga-bar-bg,
+  .estado-bar-bg {
+    height: 12px;
+  }
+
+  .estado-valor {
+    font-size: 2.2rem;
+  }
+
+  .alerta-btn {
+    width: 98%;
+    font-size: 1.15rem;
+    padding: 18px 0;
+  }
+
+  .material-icons {
+    font-size: 1.6rem;
+  }
+
+  .nav-btn {
+    font-size: 0.9rem;
+    padding: 0;
+  }
+
+  .nav-bottom {
+    height: 60px;
+  }
 }
