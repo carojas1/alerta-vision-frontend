@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
 export class ReportsService {
   constructor(private http: HttpClient) {}
 
-  exportarPorCorreo(tipo: string): Observable<any> {
-    // Cambia '/api/reports/export-email' por la URL real de tu backend si es necesario
-    return this.http.post('/api/reports/export-email', { tipo });
+  // Cambia la IP por la del backend
+  exportarPorCorreo(tab: string, email: string): Observable<any> {
+    return this.http.post('http://192.168.18.210:3000/reports/export', { tab, email });
   }
 }

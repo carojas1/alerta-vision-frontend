@@ -1,6 +1,6 @@
 <div class="reports-main">
   <header>
-    <span class="reports-title">Reportes</span>
+    <h1 class="reports-title">Reportes</h1>
   </header>
 
   <!-- Tabs -->
@@ -20,35 +20,50 @@
         type="bar">
       </canvas>
     </div>
+
     <div class="average-box">
-      <span>
-        Somnolencia promedio: 
-        <b>{{ getBarChartAverage() | number: '1.1-1' }}</b>
-        <small *ngIf="activeTab === 'diario'">Promedio diario</small>
-        <small *ngIf="activeTab === 'semanal'">Promedio semanal</small>
-        <small *ngIf="activeTab === 'mensual'">Promedio mensual</small>
-      </span>
+      <div class="prom-label">Somnolencia promedio</div>
+      <div class="prom-value">{{ getBarChartAverage() | number:'1.1-1' }}</div>
+      <div class="prom-unit">
+        por {{ activeTab === 'diario' ? 'día' : (activeTab === 'semanal' ? 'semana' : 'mes') }}
+      </div>
+      <div class="mas-som">
+        {{ activeTab === 'diario' ? 'Día' : (activeTab === 'semanal' ? 'Semana' : 'Mes') }} con más somnolencia:
+        <span class="destacado">{{ diaMasSomnoliento }}</span>
+      </div>
     </div>
-    <div class="export">
-      <span>Exportar datos:</span>
-      <button (click)="exportarCorreo()" [disabled]="exportando">
-        {{ exportando ? 'Enviando...' : 'Enviar informe a su correo' }}
+
+    <div class="exportar-box">
+      <span class="exportar-label">Exportar datos:</span>
+      <button (click)="exportarCorreo()" [disabled]="exportando" class="exportar-btn">
+        {{ exportando ? 'Enviando...' : 'Enviar informe a mi correo' }}
       </button>
+    </div>
+
+    <div class="historial-box">
+      <div class="historial-label">Historial de exportaciones</div>
+      <div class="mini-bar">
+        <div *ngFor="let h of historialExportaciones" class="mini-bar-item">
+          <div class="mini-bar-bar" [style.height.%]="h.valor"></div>
+          <div class="mini-bar-fecha">{{ h.fecha }}</div>
+        </div>
+      </div>
+      <div class="mini-bar-desc">Últimas {{ historialExportaciones.length }} exportaciones realizadas</div>
     </div>
   </div>
 
   <!-- Footer -->
   <nav class="nav-bottom">
     <div class="nav-btn" (click)="goTo('home')">
-      <span class="material-icons">home</span>
+      <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />
       <div>Inicio</div>
     </div>
     <div class="nav-btn" (click)="goTo('history')">
-      <span class="material-icons">history</span>
+      <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
       <div>Alertas</div>
     </div>
     <div class="nav-btn active">
-      <span class="material-icons">analytics</span>
+      <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
       <div>Reportes</div>
     </div>
   </nav>

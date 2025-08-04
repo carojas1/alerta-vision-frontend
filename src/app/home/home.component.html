@@ -1,56 +1,46 @@
-<div class="home-main">
-  <header>
-    <span class="alerta-logo">AlertaVisión</span>
-  </header>
+<div class="home-container">
+  <div class="logo-container">
+    <img src="/logo-alertavision.png" class="logo" alt="AlertaVisión" />
+  </div>
 
-  <section class="fatiga-box">
-    <div class="fatiga-label">Fatiga detectada</div>
-    <div class="fatiga-tip">Baje la velocidad</div>
-    <div class="fatiga-bar-bg">
-      <div class="fatiga-bar-fill" [style.width.%]="fatigaLevel"></div>
+  <div class="greeting">
+    <p>¡Hola <b>{{ userName }}</b>, vamos a conducir juntos!</p>
+  </div>
+
+  <section>
+    <h2 class="titulo-seccion">Fatiga detectada</h2>
+    <div class="tip">Quizás deberíamos descansar un rato</div>
+    <div class="bar-bg">
+      <div class="bar-fill fatiga" [style.width.%]="fatigaLevel"></div>
     </div>
   </section>
 
-  <section class="estado-box">
-    <div class="estado-label">Estado</div>
-    <div class="estado-valor">Despierto</div>
-    <div class="estado-sub">En tiempo real</div>
-    <div class="estado-graf">
-      <div class="estado-row">
-        <span class="estado-nombre despierto">Despierto</span>
-        <div class="estado-bar-bg">
-          <div class="estado-bar-fill" [style.width.%]="despiertoLevel"></div>
-        </div>
-      </div>
-<div>
-<img src="../logo-alertavision.png" alt="">
-</div>
-
-      
-      <div class="estado-row">
-        <span class="estado-nombre somnoliento">Somnoliento</span>
-        <div class="estado-bar-bg">
-          <div class="estado-bar-fill" [style.width.%]="somnolientoLevel"></div>
-        </div>
-      </div>
+  <section>
+    <h2 class="titulo-seccion">Estado</h2>
+    <div class="label">Despierto</div>
+    <div class="bar-bg">
+      <div class="bar-fill despierto" [style.width.%]="despiertoLevel"></div>
+    </div>
+    <div class="label">Somnoliento</div>
+    <div class="bar-bg">
+      <div class="bar-fill somnoliento" [style.width.%]="somnolientoLevel"></div>
     </div>
   </section>
 
-  <button class="alerta-btn">Pausar alertas</button>
-
-  <nav class="nav-bottom">
-    <div class="nav-btn active" (click)="goTo('home')">
-      <span class="material-icons">home</span>
-      <div>Inicio</div>
-    </div>
-    <div class="nav-btn" (click)="goTo('history')">
-      <span class="material-icons">history</span>
-      <div>Alertas</div>
-    </div>
-    <div class="nav-btn" (click)="goTo('reports')">
-      <span class="material-icons">analytics</span>
-      <div>Informes</div>
-
-    </div>
-  </nav>
+  <div class="logout-control">
+    <button class="logout-btn" (click)="logout()">
+      <span class="logout-icon">⎋</span> Cerrar sesión
+    </button>
+  </div>
 </div>
+
+<nav class="nav-bottom">
+  <div class="nav-btn" (click)="goTo('history')">
+    <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
+    <div>Alertas</div>
+  </div>
+  <div class="nav-btn" (click)="goTo('reports')">
+    <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
+    <div>Reportes</div>
+  </div>
+</nav>

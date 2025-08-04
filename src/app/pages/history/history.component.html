@@ -1,31 +1,38 @@
-<div class="history-main">
-  <header>
-    <span class="back-arrow" (click)="back()">&#8592;</span>
-    <span class="history-title">Alertas de somnolencia</span>
-  </header>
-
+<div class="history-container">
+  <h1 class="history-title">Historial de Alertas</h1>
   <div class="alert-list" [@listAnimation]>
-    <div
-      class="alert-item"
-      *ngFor="let alert of alerts"
-      [@itemAnim]>
-      <span class="alert-icon">!</span>
-      <div class="alert-info">
-        <div class="alert-msg">{{ alert.message }}</div>
-        <div class="alert-time">{{ alert.time }}</div>
+    <div class="alert-item" *ngFor="let alert of alerts" [@itemAnim]>
+      <div class="alert-message">{{ alert.message }}</div>
+      <div class="alert-date-time">
+        <span class="alert-date">
+          {{ formatDateTime(alert.created_at || alert.createdAt).fecha }}
+        </span>
+        <span class="alert-time">
+          {{ formatDateTime(alert.created_at || alert.createdAt).hora }}
+        </span>
       </div>
-      <span class="alert-next">&#8594;</span>
+      <a
+        *ngIf="alert.telefonoUsuario"
+        class="whatsapp-link-btn"
+        [href]="'https://wa.me/' + alert.telefonoUsuario.replace('+', '') + '?text=' + encode(alert.message)"
+        target="_blank"
+      >
+        <img src="/whatsapp-logo.svg" class="wa-icon" alt="WhatsApp" />
+        Enviar por WhatsApp
+      </a>
     </div>
   </div>
 
-  <nav class="nav-bottom">
+  <!-- Menú inferior -->
+  <nav class="bottom-nav">
     <div class="nav-btn" (click)="goTo('home')">
-      <span class="material-icons">home</span>
-      <div>Alertas</div>
+      <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />
     </div>
-    <div class="nav-btn active">
-      <span class="material-icons">analytics</span>
-      <div>Informes</div>
+    <div class="nav-btn active" (click)="goTo('history')">
+      <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
+    </div>
+    <div class="nav-btn" (click)="goTo('reports')">
+      <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
     </div>
   </nav>
 </div>

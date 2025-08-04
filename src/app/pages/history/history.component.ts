@@ -1,13 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
+import { AlertService } from '../../services/alert.service'; // ajusta el path si es necesario
 
 @Component({
   selector: 'app-history',
+  standalone: true,
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.css'],
-  standalone: true,
   imports: [CommonModule],
   animations: [
     trigger('listAnimation', [
@@ -28,21 +29,43 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
     ])
   ]
 })
-export class HistoryComponent {
-  alerts = [
-    { message: 'Alerta de somnolencia', time: 'Hace 5 minutos' },
-    { message: 'Alerta de somnolencia', time: 'Hace 10 minutos' },
-    { message: 'Alerta de somnolencia', time: 'Hace 15 minutos' },
-    { message: 'Alerta de somnolencia', time: 'Hace 20 minutos' }
-  ];
+export class HistoryComponent implements OnInit {
+  alerts: any[] = [];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private alertService: AlertService) {}
 
-  back() {
-    this.router.navigate(['/home']);
+  ngOnInit() {
+    this.alertService.getAlerts()
+      .subscribe({
+        next: (data) => {
+          // Asegúrate de invertir si quieres mostrar primero la más reciente
+          this.alerts = (data || []).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        },
+        error: (err) => {
+          console.error('No se pudieron cargar las alertas', err);
+        }
+      });
   }
 
   goTo(ruta: string) {
     this.router.navigate([`/${ruta}`]);
+  }
+
+  formatDateTime(dateStr: string): { fecha: string; hora: string } {
+    // Manejar fechas nulas o mal formateadas
+    if (!dateStr) return { fecha: 'Fecha no válida', hora: 'Fecha no válida' };
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return { fecha: 'Fecha no válida', hora: 'Fecha no válida' };
+
+    const optionsFecha: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+    const optionsHora: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
+    return {
+      fecha: date.toLocaleDateString('es-EC', optionsFecha),
+      hora: date.toLocaleTimeString('es-EC', optionsHora)
+    };
+  }
+
+  encode(text: string): string {
+    return encodeURIComponent(text || '');
   }
 }

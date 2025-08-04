@@ -1,37 +1,62 @@
-<div class="login-container">
-  <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="login-form">
-    <img src="src/assets/logo-alertavision.png" alt= />
+<div class="login-bg">
+  <div class="login-card">
+    <div class="logo-login-container">
+      <img src="/logo-alertavision.png" class="logo-login" alt="AlertaVisión" />
+    </div>
 
-    <h2>Inicia sesión en <span class="brand">AlertaVisión</span></h2>
+    <h2 class="login-title">
+      Inicia sesión en <span class="login-brand">AlertaVisión</span>
+    </h2>
 
-    <input
-      type="email"
-      name="email"
-      [(ngModel)]="email"
-      placeholder="Correo electrónico"
-      required
-    />
+    <form (ngSubmit)="onLogin()" #loginForm="ngForm" autocomplete="off">
+      <div class="input-group">
+        <input
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          placeholder="Correo electrónico"
+          required
+        />
+      </div>
 
-    <input
-      type="password"
-      name="password"
-      [(ngModel)]="password"
-      placeholder="Contraseña"
-      required
-    />
+      <div class="input-group password-group">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Contraseña"
+          required
+        />
+        <button type="button" class="eye-btn" (click)="togglePassword()" tabindex="-1">
+          <img
+            class="eye-icon"
+            [src]="showPassword ? '/game-icons--semi-closed-eye.svg' : '/pepicons-pop--eye-closed-circle.svg'"
+            alt="Mostrar/Ocultar"
+          />
+        </button>
+      </div>
 
-    <button type="submit">Ingresar</button>
+      <div *ngIf="error" class="error-message">{{ error }}</div>
 
-    <p class="register-text">
+      <button
+        type="submit"
+        class="login-btn"
+        [disabled]="!email || !password"
+      >
+        Ingresar
+      </button>
+    </form>
+
+    <div class="register-link">
       ¿No tienes una cuenta?
       <a routerLink="/register">Regístrate aquí</a>
-    </p>
+    </div>
 
-    <small class="terms">
+    <div class="login-terms">
       Al iniciar sesión, aceptas nuestras
       <a href="#">Condiciones</a> y
       <a href="#">Política de privacidad</a>.<br />
       Podemos enviarte notificaciones.
-    </small>
-  </form>
+    </div>
+  </div>
 </div>

@@ -5,6 +5,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { HomeComponent } from './home/home.component';
 import { HistoryComponent } from './pages/history/history.component';
 import { ReportsComponent } from './pages/reports/reports.component';
+import { AdminUsersComponent } from './admin-users/admin-users.component';
 
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
@@ -31,7 +32,8 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'history', component: HistoryComponent, canActivate: [AuthGuard] },
-  { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },
+  { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] }, // <-- aquí!
+  { path: 'admin-users', component: AdminUsersComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' }
 ];

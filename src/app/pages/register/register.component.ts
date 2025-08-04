@@ -1,36 +1,58 @@
-// src/app/pages/register/register.component.ts
 import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
+  standalone: true,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule]
 })
 export class RegisterComponent {
   nombre = '';
   email = '';
+  telefono = ''; // <-- Nuevo campo
   password = '';
-  confirmPassword = '';
-  error = '';
+  showPassword = false;
+  loading = false;
+  errorMessage = '';
+  successMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
-  onSubmit() {
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Las contraseñas no coinciden';
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+
+  onRegister() {
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    // Validación rápida del teléfono (ejemplo Ecuador)
+    const telefonoValido = /^(\+593|0)\d{9}$/.test(this.telefono.trim());
+    if (!telefonoValido) {
+      this.errorMessage = 'Ingrese un número de teléfono válido (Ecuador)';
       return;
     }
-    this.authService.register(this.nombre, this.email, this.password)
-      .subscribe({
-        next: () => this.router.navigate(['/login']),
-        error: () => this.error = 'No se pudo registrar. Intenta con otro correo.'
-      });
+
+    this.loading = true;
+    this.auth.register(this.nombre, this.email, this.password, this.telefono).subscribe({
+      next: () => {
+        this.successMessage = 'Registro exitoso. ¡Ya puedes iniciar sesión!';
+        this.errorMessage = '';
+        this.loading = false;
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 1000);
+      },
+      error: () => {
+        this.errorMessage = 'No se pudo registrar el usuario.';
+        this.successMessage = '';
+        this.loading = false;
+      }
+    });
   }
 }
