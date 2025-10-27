@@ -1,24 +1,46 @@
 <div class="admin-users-container">
-  <h2>Usuarios Registrados</h2>
+  <img src="/logo-alertavision.png" alt="Alerta Visión" class="logo-alertavision" />
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Correo</th>
-        <th>Rol</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let user of users">
-        <td>{{ user.id }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.rol }}</td>
-        <td>
-          <button (click)="eliminarUsuario(user.id)">Eliminar</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <h1 class="admin-title">Gestión de Usuarios</h1>
+  <div class="admin-subtitle">Panel de administración de Alerta Visión</div>
+
+  <div class="tabla-scroll">
+    <table class="tabla-usuarios">
+      <thead>
+        <tr>
+          <th>Correo electrónico</th>
+          <th>Teléfono</th>
+          <th>Rol</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of usuarios">
+          <td>{{ user.email }}</td>
+          <td>{{ user.telefono }}</td>
+          <td>
+            <span
+              [ngClass]="{
+                'badge-rol': true,
+                'admin': user.rol === 'admin',
+                'user': user.rol === 'usuario'
+              }"
+            >
+              {{ user.rol | titlecase }}
+            </span>
+          </td>
+          <td>
+            <!-- Enviar SIEMPRE string (no number) -->
+            <button
+              class="btn-eliminar"
+              (click)="eliminarUsuario(user.id!)"
+              [disabled]="!user.id"
+            >
+              <img src="/icons8-trash.svg" alt="Eliminar" class="icon-delete" />
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

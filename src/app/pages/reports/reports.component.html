@@ -1,70 +1,66 @@
-<div class="reports-main">
-  <header>
-    <h1 class="reports-title">Reportes</h1>
-  </header>
+<div class="reports-container">
+  <h1 class="title">Reportes</h1>
 
-  <!-- Tabs -->
-  <div class="reports-tabs">
-    <button [class.active]="activeTab === 'diario'" (click)="selectTab('diario')">Diario</button>
-    <button [class.active]="activeTab === 'semanal'" (click)="selectTab('semanal')">Semanal</button>
-    <button [class.active]="activeTab === 'mensual'" (click)="selectTab('mensual')">Mensual</button>
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab==='diario'" (click)="setTab('diario')">Diario</button>
+    <button class="tab" [class.active]="activeTab==='semanal'" (click)="setTab('semanal')">Semanal</button>
+    <button class="tab" [class.active]="activeTab==='mensual'" (click)="setTab('mensual')">Mensual</button>
   </div>
 
-  <!-- Card y gráfica -->
-  <div class="reports-card">
-    <div class="chart-container">
-      <canvas
-        baseChart
-        [data]="barChartData"
-        [options]="barChartOptions"
-        type="bar">
-      </canvas>
-    </div>
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
 
-    <div class="average-box">
-      <div class="prom-label">Somnolencia promedio</div>
-      <div class="prom-value">{{ getBarChartAverage() | number:'1.1-1' }}</div>
-      <div class="prom-unit">
-        por {{ activeTab === 'diario' ? 'día' : (activeTab === 'semanal' ? 'semana' : 'mes') }}
-      </div>
-      <div class="mas-som">
-        {{ activeTab === 'diario' ? 'Día' : (activeTab === 'semanal' ? 'Semana' : 'Mes') }} con más somnolencia:
-        <span class="destacado">{{ diaMasSomnoliento }}</span>
-      </div>
-    </div>
+  <!-- Diario -->
+  <div class="chart-card" *ngIf="activeTab==='diario'">
+    <canvas baseChart
+      [type]="'bar'"
+      [data]="{ labels: barLabels, datasets: barData }"
+      [options]="barOptions">
+    </canvas>
+    <div class="empty" *ngIf="!loading && (!barData[0].data || !barData[0].data.length)">Sin datos en este rango.</div>
+  </div>
 
-    <div class="exportar-box">
-      <span class="exportar-label">Exportar datos:</span>
-      <button (click)="exportarCorreo()" [disabled]="exportando" class="exportar-btn">
-        {{ exportando ? 'Enviando...' : 'Enviar informe a mi correo' }}
-      </button>
-    </div>
+  <!-- Semanal -->
+  <div class="chart-card" *ngIf="activeTab==='semanal'">
+    <canvas baseChart
+      [type]="'line'"
+      [data]="{ labels: lineLabels, datasets: lineData }"
+      [options]="lineOptions">
+    </canvas>
+    <div class="empty" *ngIf="!loading && (!lineData[0].data || !lineData[0].data.length)">Sin datos en este rango.</div>
+  </div>
 
-    <div class="historial-box">
-      <div class="historial-label">Historial de exportaciones</div>
-      <div class="mini-bar">
-        <div *ngFor="let h of historialExportaciones" class="mini-bar-item">
-          <div class="mini-bar-bar" [style.height.%]="h.valor"></div>
-          <div class="mini-bar-fecha">{{ h.fecha }}</div>
-        </div>
-      </div>
-      <div class="mini-bar-desc">Últimas {{ historialExportaciones.length }} exportaciones realizadas</div>
+  <!-- Mensual -->
+  <div class="chart-card" *ngIf="activeTab==='mensual'">
+    <canvas baseChart
+      [type]="'doughnut'"
+      [data]="{ labels: donutLabels, datasets: donutData }"
+      [options]="donutOptions">
+    </canvas>
+    <div class="empty" *ngIf="!loading && (!donutData[0].data || !donutData[0].data.length)">Sin datos en este rango.</div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="label">Somnolencia promedio</div>
+      <div class="value">{{ promedioDia | number:'1.0-1' }}</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Día mayor</div>
+      <div class="value">{{ mejorDia | number:'1.0-1' }}</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Día menor</div>
+      <div class="value">{{ peorDia | number:'1.0-1' }}</div>
     </div>
   </div>
 
-  <!-- Footer -->
-  <nav class="nav-bottom">
-    <div class="nav-btn" (click)="goTo('home')">
-      <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />
-      <div>Inicio</div>
-    </div>
-    <div class="nav-btn" (click)="goTo('history')">
-      <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
-      <div>Alertas</div>
-    </div>
-    <div class="nav-btn active">
-      <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
-      <div>Reportes</div>
-    </div>
-  </nav>
+  <div class="export">
+    <input type="email" placeholder="tu@correo.com" [(ngModel)]="email">
+    <button (click)="exportarCorreo()" [disabled]="sending">
+      {{ sending ? 'Enviando…' : 'Enviar informe' }}
+    </button>
+    <div class="export-msg" *ngIf="exportMsg">{{ exportMsg }}</div>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando…</div>
 </div>

@@ -1,25 +1,39 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../enviromets/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface Usuario {
+  id?: string;
+  nombre: string;
+  email: string;
+  telefono: string;
+  rol: string;
+}
+
+@Injectable({ providedIn: 'root' })
 export class UserService {
-  // Usa la IP de tu laptop en la red local
-  private apiUrl = 'http://192.168.18.210:3000/users';
+  private baseUrl = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient) {}
 
-  getUsers(): Observable<any[]> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any[]>(this.apiUrl, { headers });
+  getUsuarios(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(this.baseUrl);
   }
 
-  deleteUser(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.delete(`${this.apiUrl}/${id}`, { headers });
+  getUsuario(id: string): Observable<Usuario> {
+    return this.http.get<Usuario>(`${this.baseUrl}/${id}`);
+  }
+
+  crearUsuario(data: Usuario): Observable<Usuario> {
+    return this.http.post<Usuario>(this.baseUrl, data);
+  }
+
+  actualizarUsuario(id: string, data: Partial<Usuario>): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.baseUrl}/${id}`, data);
+  }
+
+  eliminarUsuario(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

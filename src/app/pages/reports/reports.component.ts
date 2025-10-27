@@ -1,147 +1,126 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { NgChartsModule } from 'ng2-charts';
-import { Router } from '@angular/router';
+import { ChartOptions } from 'chart.js';
 import { ReportsService } from '../../services/reports.service';
-import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule, NgChartsModule],
+  imports: [CommonModule, FormsModule, NgChartsModule],
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css'],
 })
-export class ReportsComponent {
+export class ReportsComponent implements OnInit {
   activeTab: 'diario' | 'semanal' | 'mensual' = 'diario';
-  exportando = false;
-  email = ''; // Email del usuario autenticado
 
-  barChartData: any;
-  barChartOptions: any;
+  from!: string; to!: string; userId?: string;
 
-  mesesCortos = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  semanas = ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Semana 5', 'Semana 6'];
-  diasCortos = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  loading = false;
+  errorMsg = '';
+  sending = false;
+  exportMsg = '';
+  email = '';
 
-  diaMasSomnoliento = '';
-  historialExportaciones = [
-    { fecha: '20/07', valor: 85 },
-    { fecha: '21/07', valor: 30 },
-    { fecha: '22/07', valor: 65 },
-    { fecha: '24/07', valor: 50 },
-    { fecha: '27/07', valor: 100 }
-  ];
+  promedioDia = 0; mejorDia = 0; peorDia = 0;
 
-  constructor(
-    private router: Router,
-    private reportsService: ReportsService,
-    private authService: AuthService
-  ) {
-    this.selectTab(this.activeTab);
-    // Obtiene el email de forma segura siempre que inicia el componente
-    this.email = this.authService.getEmail();
+  barLabels: string[] = [];
+  barData: any[] = [{ data: [], label: 'Somnolencia', backgroundColor: '#E5B27F', borderRadius: 8, barThickness: 24 }];
+  barOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: 'rgba(0,0,0,0.06)' } }
+    }
+  };
+
+  lineLabels: string[] = [];
+  lineData: any[] = [{ data: [], label: 'Somnolencia semanal', fill: 'origin', borderColor: '#D2995A', backgroundColor: 'rgba(226,174,120,.22)', tension: 0.35, pointRadius: 3 }];
+  lineOptions: ChartOptions<'line'> = {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.06)' } }
+    }
+  };
+
+  donutLabels: string[] = ['Sueño ligero', 'Sueño profundo', 'Despierto'];
+  donutData: any[] = [{ data: [], backgroundColor: ['#F2D5B0', '#E5B27F', '#CF9A66'], borderWidth: 0 }];
+  donutOptions: ChartOptions<'doughnut'> = {
+    responsive: true, cutout: '65%',
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 14 } } }
+  };
+
+  constructor(private reportsSvc: ReportsService) {}
+
+  ngOnInit(): void {
+    this.setRangeDays(7);
+    this.loadDaily();
   }
 
-  selectTab(tab: 'diario' | 'semanal' | 'mensual') {
+  setTab(tab: 'diario'|'semanal'|'mensual') {
     this.activeTab = tab;
+    this.errorMsg = '';
+    if (tab === 'diario') { this.setRangeDays(7); this.loadDaily(); }
+    if (tab === 'semanal') { this.setRangeDays(28); this.loadWeekly(); }
+    if (tab === 'mensual') { this.setRangeDays(30); this.loadMonthly(); }
+  }
 
-    if (tab === 'diario') {
-      this.barChartData = {
-        labels: this.diasCortos,
-        datasets: [
-          { data: [7, 5, 6, 8, 4, 7, 6], label: 'Somnolencia', backgroundColor: '#dec6a1' }
-        ]
-      };
-    } else if (tab === 'semanal') {
-      this.barChartData = {
-        labels: this.semanas,
-        datasets: [
-          { data: [41, 36, 33, 38, 44, 29], label: 'Somnolencia', backgroundColor: '#dec6a1' }
-        ]
-      };
-    } else if (tab === 'mensual') {
-      this.barChartData = {
-        labels: this.mesesCortos,
-        datasets: [
-          { data: [160, 143, 129, 156, 149, 172, 185, 144, 130, 153, 168, 175], label: 'Somnolencia', backgroundColor: '#dec6a1' }
-        ]
-      };
-    }
+  setRangeDays(days: number) {
+    const end = new Date();
+    const to = new Date(Date.UTC(end.getFullYear(), end.getMonth(), end.getDate(), 23, 59, 59));
+    const from = new Date(to); from.setUTCDate(to.getUTCDate() - (days - 1));
+    this.from = from.toISOString(); this.to = to.toISOString();
+  }
 
-    this.barChartOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        title: { display: false }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: '#3d2b00',
-            font: { size: 14, weight: 'bold' }
-          }
-        },
-        y: {
-          beginAtZero: true,
-          ticks: {
-            color: '#3d2b00',
-            font: { size: 14, weight: 'bold' }
-          }
+  private loadDaily() {
+    this.loading = true;
+    this.barLabels = []; this.barData[0].data = [];
+    this.reportsSvc.getDaily(this.from, this.to, this.userId).subscribe({
+      next: (res) => {
+        this.barLabels = res.labels;
+        this.barData[0].data = res.values;
+        if (res.values.length) {
+          const sum = res.values.reduce((a,b)=>a+b,0);
+          this.promedioDia = Number((sum / res.values.length).toFixed(1));
+          this.mejorDia = Math.max(...res.values);
+          this.peorDia = Math.min(...res.values);
+        } else {
+          this.promedioDia = this.mejorDia = this.peorDia = 0;
         }
-      }
-    };
-
-    this.setDiaMasSomnoliento();
+        this.loading = false;
+      },
+      error: () => { this.errorMsg = 'No se pudo cargar Diario'; this.loading = false; }
+    });
   }
 
-  setDiaMasSomnoliento() {
-    const arr = this.barChartData.datasets[0].data as number[];
-    const labels = this.barChartData.labels;
-    if (!arr || arr.length === 0) {
-      this.diaMasSomnoliento = '-';
-      return;
-    }
-    const maxIdx = arr.indexOf(Math.max(...arr));
-    this.diaMasSomnoliento = labels[maxIdx];
+  private loadWeekly() {
+    this.loading = true;
+    this.lineLabels = []; this.lineData[0].data = [];
+    this.reportsSvc.getWeekly(this.from, this.to, this.userId).subscribe({
+      next: (res) => { this.lineLabels = res.labels; this.lineData[0].data = res.values; this.loading = false; },
+      error: () => { this.errorMsg = 'No se pudo cargar Semanal'; this.loading = false; }
+    });
   }
 
-  getBarChartAverage() {
-    const arr = this.barChartData.datasets[0].data as number[];
-    if (!arr || arr.length === 0) return 0;
-    return arr.reduce((a, b) => a + b, 0) / arr.length;
-  }
-
-  goTo(ruta: string) {
-    this.router.navigate([`/${ruta}`]);
+  private loadMonthly() {
+    this.loading = true;
+    this.donutData[0].data = [];
+    this.reportsSvc.getMonthly(this.from, this.to, this.userId).subscribe({
+      next: (res) => { this.donutLabels = res.labels; this.donutData[0].data = res.values; this.loading = false; },
+      error: () => { this.errorMsg = 'No se pudo cargar Mensual'; this.loading = false; }
+    });
   }
 
   exportarCorreo() {
-    this.exportando = true;
-    // ACTUALIZA el email por si el usuario cambió sesión
-    this.email = this.authService.getEmail();
-    if (!this.email) {
-      alert('No se encontró el email del usuario');
-      this.exportando = false;
-      return;
-    }
-
-    this.reportsService.exportarPorCorreo(this.activeTab, this.email).subscribe({
-      next: () => {
-        alert('¡Reporte enviado a tu correo!');
-        this.exportando = false;
-        // Actualiza el historial
-        const now = new Date();
-        const fecha = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}`;
-        const valor = Math.floor(Math.random()*100)+40;
-        if (this.historialExportaciones.length >= 5) this.historialExportaciones.shift();
-        this.historialExportaciones.push({ fecha, valor });
-      },
-      error: () => {
-        alert('Error al enviar el reporte. Intenta más tarde.');
-        this.exportando = false;
-      }
+    if (!this.email) { this.exportMsg = 'Ingresa tu correo.'; return; }
+    this.sending = true; this.exportMsg = '';
+    this.reportsSvc.exportarPorCorreo(this.activeTab, this.email).subscribe({
+      next: (res) => { this.exportMsg = res?.message || 'Informe enviado'; this.sending = false; },
+      error: () => { this.exportMsg = 'No se pudo enviar'; this.sending = false; }
     });
   }
 }

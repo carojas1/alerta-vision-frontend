@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import jwt_decode from 'jwt-decode'; // ← CORRECTO para jwt-decode v3
+import jwt_decode from 'jwt-decode';
 
 @Component({
   selector: 'app-login',
@@ -31,23 +31,26 @@ export class LoginComponent {
   onLogin() {
     this.authService.login(this.email, this.password).subscribe({
       next: (res: any) => {
+        // Guarda el token
         this.authService.saveToken(res.access_token);
 
-        // Decodifica el token con jwt_decode
+        // Decodifica el token
         const decoded: any = jwt_decode(res.access_token);
-        const role = decoded?.role;
-        const nombre = decoded?.nombre;
-        const email = decoded?.email;
 
-        // Guarda nombre y email en localStorage si quieres usar después
-        if (nombre) {
-          localStorage.setItem('nombre', nombre);
-        }
-        if (email) {
-          localStorage.setItem('email', email);
-        }
+        // Soporta ambos nombres (role o rol)
+        const role = decoded?.rol || decoded?.role || '';
+        const nombre = decoded?.nombre || '';
+        const email = decoded?.email || '';
 
-        // Redirección por rol
+        // Debug: Mira en consola qué valores tiene el token
+        console.log('decoded:', decoded, 'role:', role);
+
+        // Guarda info útil en localStorage
+        localStorage.setItem('nombre', nombre);
+        localStorage.setItem('email', email);
+        localStorage.setItem('role', role);
+
+        // Redirección según rol
         if (role === 'admin') {
           this.router.navigate(['/admin-users']);
         } else {

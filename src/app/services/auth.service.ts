@@ -7,7 +7,7 @@ import jwt_decode from 'jwt-decode';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://192.168.18.210:3000/auth'; // ← IP actualizada aquí
+  private apiUrl = 'http://localhost:3000/auth'; // ← IP quitada, usa localhost
 
   userName: string = '';
   currentUser: any = null;

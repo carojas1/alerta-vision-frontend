@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AlertService {
-  // Usa la IP local del backend
-  private apiUrl = "http://192.168.18.210:3000/alert";
+  // Conecta con el backend local (sin IP)
+  private apiUrl = "http://localhost:3000/alert";
 
   constructor(private http: HttpClient) {}
 
