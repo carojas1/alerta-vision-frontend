@@ -1,46 +1,56 @@
 <div class="home-container">
-  <div class="logo-container">
+  
+  <div class="header">
     <img src="/logo-alertavision.png" class="logo" alt="AlertaVisión" />
-  </div>
-
-  <div class="greeting">
-    <p>¡Hola <b>{{ userName }}</b>, vamos a conducir juntos!</p>
-  </div>
-
-  <section>
-    <h2 class="titulo-seccion">Fatiga detectada</h2>
-    <div class="tip">Quizás deberíamos descansar un rato</div>
-    <div class="bar-bg">
-      <div class="bar-fill fatiga" [style.width.%]="fatigaLevel"></div>
-    </div>
-  </section>
-
-  <section>
-    <h2 class="titulo-seccion">Estado</h2>
-    <div class="label">Despierto</div>
-    <div class="bar-bg">
-      <div class="bar-fill despierto" [style.width.%]="despiertoLevel"></div>
-    </div>
-    <div class="label">Somnoliento</div>
-    <div class="bar-bg">
-      <div class="bar-fill somnoliento" [style.width.%]="somnolientoLevel"></div>
-    </div>
-  </section>
-
-  <div class="logout-control">
     <button class="logout-btn" (click)="logout()">
-      <span class="logout-icon">⎋</span> Cerrar sesión
+      Cerrar sesión
     </button>
   </div>
+
+  <h1 class="greeting">
+    ¡Hola {{ userName }}! <br> vamos a conduicr juntos
+  </h1>
+
+  <div class="status-card glow-border">
+    <h2>Detectando fatigas</h2>
+    <p class="subtitle">Mantén la concentratión</p>
+    
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" [style.width.%]="fatigaLevel"></div>
+      <span class="progress-label">{{ fatigaLevel }}%</span>
+    </div>
+    
+    <button class="action-btn" (click)="onStartMonitoring()">
+      Iniciar monitoréo
+    </button>
+    <p class="subtitle-small">Conecta tus lentes para iniciar</p>
+  </div>
+
+  <div class="status-card">
+    <h2>No se detectan los lentes</h2>
+    <p class="subtitle">Enciende tus lentes y acércalos para vincular.</p>
+    
+    <div class="button-group">
+      <button class="action-btn secondary" (click)="onRetry()">Reitentar</button>
+      <button class="action-btn primary" (click)="onConnectLenses()">Conectar</button>
+    </div>
+  </div>
+
 </div>
 
 <nav class="nav-bottom">
+  <div class="nav-btn active" (click)="goTo('home')">
+    <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />
+    <span>Inicio</span>
+  </div>
+  
   <div class="nav-btn" (click)="goTo('history')">
     <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
-    <div>Alertas</div>
+    <span>Alertas</span>
   </div>
+  
   <div class="nav-btn" (click)="goTo('reports')">
     <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
-    <div>Reportes</div>
+    <span>Reportes</span>
   </div>
 </nav>

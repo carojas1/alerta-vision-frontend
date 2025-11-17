@@ -18,6 +18,7 @@ export class LoginComponent {
   password = '';
   error = '';
   showPassword = false;
+  isModalOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -28,29 +29,33 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
+  openModal(event: Event) {
+    event.preventDefault(); 
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+  }
+
   onLogin() {
     this.authService.login(this.email, this.password).subscribe({
       next: (res: any) => {
-        // Guarda el token
         this.authService.saveToken(res.access_token);
-
-        // Decodifica el token
         const decoded: any = jwt_decode(res.access_token);
-
-        // Soporta ambos nombres (role o rol)
         const role = decoded?.rol || decoded?.role || '';
         const nombre = decoded?.nombre || '';
         const email = decoded?.email || '';
-
-        // Debug: Mira en consola qué valores tiene el token
-        console.log('decoded:', decoded, 'role:', role);
-
-        // Guarda info útil en localStorage
+        
+        // --- Lógica de WhatsApp ---
+        const telefono = decoded?.telefono || ''; 
+        console.log('Token decodificado:', decoded); 
         localStorage.setItem('nombre', nombre);
         localStorage.setItem('email', email);
         localStorage.setItem('role', role);
+        localStorage.setItem('telefono', telefono); // ¡Guardamos el teléfono!
+        // --- FIN ---
 
-        // Redirección según rol
         if (role === 'admin') {
           this.router.navigate(['/admin-users']);
         } else {

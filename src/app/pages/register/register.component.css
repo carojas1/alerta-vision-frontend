@@ -1,15 +1,52 @@
+/* === Estilo Registro "Ultra-Moderno" (Negro/Azul) === */
+
+/* --- 1. Definición de Animaciones (Keyframes) --- */
+
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+  20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+
+/* ¡ANIMACIÓN "PEPA" PARA EL BOTÓN! */
+@keyframes subtleGlow {
+  0%   { box-shadow: 0 4px 15px rgba(0, 175, 255, 0.2); }
+  50%  { box-shadow: 0 6px 30px rgba(0, 175, 255, 0.5); }
+  100% { box-shadow: 0 4px 15px rgba(0, 175, 255, 0.2); }
+}
+
+
+/* --- 2. Estilos del Componente --- */
+
 .register-bg {
   min-height: 100vh;
-  background: #f6efe6;
+  /* Fondo: Negro profundo */
+  background: #000000;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Inter', Arial, sans-serif;
 }
 
 .register-card {
-  background: #fffdfa;
+  /* Fondo: Un gris azulado muy oscuro */
+  background: #0f1422;
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(120, 84, 29, 0.10);
+  /* Borde: Un borde sutil que define la tarjeta */
+  border: 1px solid #1f2a47;
+  /* Sombra: Un 'glow' o brillo azulado sutil */
+  box-shadow: 0 8px 32px rgba(0, 110, 255, 0.1);
   padding: 2.3rem 2rem 2rem 2rem;
   max-width: 400px;
   width: 97vw;
@@ -17,6 +54,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
+  /* Animación de entrada */
+  animation: fadeInCard 0.5s ease-out forwards;
 }
 
 .logo-container {
@@ -26,12 +65,18 @@
 }
 
 .logo {
-  width: 140px;
+  /* Logo grande */
+  width: 170px;
   margin-bottom: 0.1rem;
+  
+  /* --- ¡ARREGLO DEL LOGO NEGRO! --- */
+  /* Esto fuerza al logo negro a volverse blanco */
+  filter: brightness(0) invert(1);
 }
 
 .register-title {
-  color: #965813;
+  /* Color: Blanco puro */
+  color: #FFFFFF;
   font-size: 2.1rem;
   font-weight: 800;
   margin-top: 0.3rem;
@@ -49,27 +94,35 @@
   align-items: center;
 }
 
+/* ESTO ARREGLA LOS INPUTS (porque ya no pelea con styles.css) */
 .input-group input {
-  background: #f3f1ed;
-  border: 1.5px solid #e1c8a3;
+  /* Fondo: Un tono oscuro */
+  background: #080c14;
+  /* Borde: Un borde azulado muy sutil */
+  border: 1.5px solid #2a3b5f;
   border-radius: 10px;
   padding: 1rem 1.1rem;
   font-size: 1.1rem;
   width: 100%;
   outline: none;
-  color: #3d260b;
-  transition: border 0.13s, background 0.12s;
+  /* Color: Texto claro */
+  color: #E0E0E0;
+  transition: border 0.13s, background 0.12s, box-shadow 0.15s;
   font-family: inherit;
-  box-shadow: 0 1px 5px rgba(120,84,29,0.06);
+  box-shadow: none;
 }
 
 .input-group input:focus {
-  background: #fff;
-  border: 1.5px solid #cfa764;
+  background: #080c14;
+  /* Borde: ¡El Azul Eléctrico cuando está activo! */
+  border: 1.5px solid #00AFFF;
+  /* Sombra: Un 'glow' azulado */
+  box-shadow: 0 0 10px rgba(0, 175, 255, 0.5);
 }
 
 .input-group input::placeholder {
-  color: #ba9c68;
+  /* Color: Un gris azulado */
+  color: #5a6b8c;
   font-weight: 400;
 }
 
@@ -98,64 +151,101 @@
 .eye-icon {
   width: 25px;
   height: 25px;
-  filter: grayscale(0.2) brightness(0.97);
+  /* Tinte: gris azulado */
+  filter: invert(50%) sepia(13%) saturate(1477%) hue-rotate(183deg) brightness(97%) contrast(87%);
   transition: filter .12s;
 }
-.eye-btn:hover .eye-icon { filter: brightness(1.1); }
+
+.eye-btn:hover .eye-icon {
+  /* Tinte Hover: Azul Eléctrico */
+  filter: invert(57%) sepia(99%) saturate(4179%) hue-rotate(167deg) brightness(101%) contrast(101%);
+}
 
 .error-message {
-  color: #d56818;
+  /* Color: ¡Amarillo Neón para alertas! */
+  color: #FFD600;
   font-size: 1.09rem;
   margin-bottom: 9px;
   margin-top: -5px;
   min-height: 20px;
   text-align: center;
+  animation: shakeError 0.4s ease-in-out forwards;
 }
 
+/* ESTO ARREGLA EL BOTÓN (porque ya no pelea con styles.css) */
 .register-btn {
   width: 100%;
   padding: 1.08rem 0;
-  background: linear-gradient(94deg, #bc873a 60%, #f8e8c2 100%);
-  color: #623b08;
+  /* Fondo: ¡El gradiente Azul Eléctrico! */
+  background: linear-gradient(90deg, #00AFFF 0%, #0077FF 100%);
+  color: #FFFFFF;
   border: none;
   border-radius: 11px;
   font-weight: 800;
   font-size: 1.18rem;
   margin-top: 0.9rem;
-  transition: background 0.14s, color 0.12s, box-shadow 0.14s;
+  transition: all 0.2s ease-out;
   letter-spacing: .2px;
-  box-shadow: 0 1.5px 9px rgba(120,84,29,0.06);
+  box-shadow: 0 4px 15px rgba(0, 175, 255, 0.2);
   opacity: 1;
 }
+
 .register-btn:disabled {
-  background: #ece4d6;
-  color: #a58859;
+  background: #1a2233;
+  color: #5a6b8c;
   opacity: 1;
   cursor: not-allowed;
+  box-shadow: none;
+  animation: none;
 }
+
+.register-btn:not(:disabled) {
+  /* ¡AQUÍ APLICAMOS LA ANIMACIÓN "PEPA"! */
+  animation: subtleGlow 2.5s infinite ease-in-out;
+}
+
 .register-btn:not(:disabled):hover {
-  background: linear-gradient(91deg, #a5731b 80%, #d8bb7f 100%);
-  color: #fff;
+  background: linear-gradient(90deg, #00BFFF 0%, #0088FF 100%);
+  color: #FFFFFF;
+  box-shadow: 0 6px 30px rgba(0, 175, 255, 0.4);
+  transform: translateY(-2px);
+  animation-play-state: paused;
 }
 
 .login-link {
   margin-top: 1.1rem;
   font-size: 1.10rem;
-  color: #83551b;
+  /* Color: Texto secundario gris azulado */
+  color: #9eaecf;
   font-family: 'Inter', Arial, sans-serif;
 }
 .login-link a {
-  color: #965813;
+  /* Color: El enlace clicable Azul Eléctrico */
+  color: #00AFFF;
   font-weight: 700;
   text-decoration: none;
   margin-left: 3px;
   transition: color 0.15s;
 }
-.login-link a:hover { color: #bc873a; }
+.login-link a:hover { color: #33CFFF; }
 
 @media (max-width: 600px) {
-  .register-card { padding: 1.1rem 0.3rem; border-radius: 1.1rem; max-width: 99vw;}
-  .logo { width: 80px; }
-  .register-title { font-size: 1.18rem; }
-  .register-btn { font-size: 1rem; }
+  .register-card {
+    padding: 1.1rem 0.3rem;
+    border-radius: 1.1rem;
+    max-width: 99vw;
+    /* Inmersivo en móvil */
+    background: none;
+    border: none;
+    box-shadow: none;
+  }
+  .logo {
+    width: 100px; /* Logo más chico en móvil */
+  }
+  .register-title {
+    font-size: 1.18rem;
+  }
+  .register-btn {
+    font-size: 1rem;
+  }
 }

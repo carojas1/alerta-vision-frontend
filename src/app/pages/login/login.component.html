@@ -1,7 +1,9 @@
 <div class="login-bg">
   <div class="login-card">
     <div class="logo-login-container">
+      
       <img src="/logo-alertavision.png" class="logo-login" alt="AlertaVisión" />
+
     </div>
 
     <h2 class="login-title">
@@ -31,7 +33,7 @@
           <img
             class="eye-icon"
             [src]="showPassword ? '/game-icons--semi-closed-eye.svg' : '/pepicons-pop--eye-closed-circle.svg'"
-            alt="Mostrar/Ocultar"
+            alt="Mostrar/Ocupar"
           />
         </button>
       </div>
@@ -54,9 +56,23 @@
 
     <div class="login-terms">
       Al iniciar sesión, aceptas nuestras
-      <a href="#">Condiciones</a> y
-      <a href="#">Política de privacidad</a>.<br />
+      <a href="#" (click)="openModal($event)">Condiciones</a> y
+      <a href="#" (click)="openModal($event)">Política de privacidad</a>.<br />
       Podemos enviarte notificaciones.
     </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <h2>Política de Privacidad – Alerta Visión</h2>
+    
+    <p><strong>1. Introducción</strong></p>
+    <p>Alerta Visión es un sistema diseñado para brindar monitoreo preventivo...</p>
+    <p>...trabajamos continuamente para fortalecer nuestra infraestructura y reducir riesgos.</p>
+
+    <button class="modal-close-btn" (click)="closeModal()">Entendido</button>
+
   </div>
 </div>

@@ -1,20 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router'; // <-- Importamos RouterModule por si acaso
 import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule], // <-- Agregamos RouterModule
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
   userName = '';
-  fatigaLevel = 0;
-  despiertoLevel = 0;
-  somnolientoLevel = 0;
+  fatigaLevel = 0; // Esta variable sí la usa el HTML "pepa"
   selectedTab = 'home';
 
   constructor(
@@ -24,17 +22,39 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.userName = this.auth.userName || 'Usuario';
-    setTimeout(() => this.fatigaLevel = 85, 400);
-    setTimeout(() => this.despiertoLevel = 60, 800);
-    setTimeout(() => this.somnolientoLevel = 42, 1200);
+    // Animación para la barra de fatiga
+    setTimeout(() => this.fatigaLevel = 100, 400);
   }
+
+  // --- ¡FUNCIONES "PEPA" PARA LOS BOTONES NUEVOS! ---
+
+  onStartMonitoring() {
+    console.log('¡BOTÓN INICIAR MONITORÉO PRESIONADO!');
+    // Aquí pondremos la lógica para tu ESP32
+    alert('Iniciando monitoreo... (¡Aquí conectas tu ESP32!)');
+  }
+
+  onConnectLenses() {
+    console.log('¡BOTÓN CONECTAR LENTES PRESIONADO!');
+    // Aquí pondremos la lógica de conexión Bluetooth/WiFi
+    alert('Buscando lentes... (¡Aquí conectas tu ESP32!)');
+  }
+
+  onRetry() {
+    console.log('¡BOTÓN REINTENTAR PRESIONADO!');
+    alert('Reintentando conexión...');
+  }
+
+  // --- FUNCIONES QUE YA TENÍAS ---
 
   goTo(tab: string) {
     this.selectedTab = tab;
-    if (tab === 'alertas' || tab === 'history') {
-      this.router.navigate(['/history']);  // ruta para Alertas
-    } else if (tab === 'reportes' || tab === 'reports') {
-      this.router.navigate(['/reports']);  // ruta para Reportes
+    
+    // Hacemos que los botones de la barra de nav funcionen
+    if (tab === 'history') {
+      this.router.navigate(['/history']);
+    } else if (tab === 'reports') {
+      this.router.navigate(['/reports']);
     } else if (tab === 'home') {
       this.router.navigate(['/home']);
     } else {

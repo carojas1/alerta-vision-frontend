@@ -3,13 +3,18 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { RouterModule } from '@angular/router'; // <-- MIRA AQUÍ (Agregué esta línea)
 
 @Component({
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule // <-- MIRA AQUÍ (Agregué esto a la lista)
+  ]
 })
 export class RegisterComponent {
   nombre = '';

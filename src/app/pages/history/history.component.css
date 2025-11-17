@@ -1,137 +1,152 @@
-.history-container {
-  padding: 32px 0 95px 0;
-  max-width: 430px;
-  margin: 0 auto;
-  min-height: 100vh;
-  background: #fffaf3;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* === Estilo Historial "Pepa" (Basado en image_1dea9e.jpg) === */
+
+/* --- Keyframes (Los dejamos por si acaso, no molestan) --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes subtleGlow {
+  0%   { box-shadow: 0 0 15px rgba(0, 175, 255, 0.3); }
+  50%  { box-shadow: 0 0 25px rgba(0, 175, 255, 0.7); }
+  100% { box-shadow: 0 0 15px rgba(0, 175, 255, 0.3); }
 }
 
+/* --- Estilos del Componente --- */
+.history-container {
+  min-height: 100vh;
+  background: #000000;
+  padding: 1.5rem 1rem 100px 1rem; 
+  background-image: 
+    linear-gradient(rgba(0, 175, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 175, 255, 0.07) 1px, transparent 1px);
+  background-size: 30px 30px;
+  animation: fadeIn 0.5s ease-out;
+}
 .history-title {
+  color: #FFFFFF;
   font-size: 2rem;
   font-weight: 800;
-  color: #b6761a;
-  margin-bottom: 24px;
+  text-align: center;
+  margin: 1rem 0 2rem 0;
 }
-
 .alert-list {
   width: 100%;
-  max-width: 390px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 1rem;
 }
-
 .alert-item {
-  background: #fff6de;
+  background: #0f1422;
   border-radius: 16px;
-  box-shadow: 0 4px 18px #ffe3b244;
-  padding: 24px 18px 15px 18px;
-  margin-bottom: 5px;
+  border: 1px solid #1f2a47;
+  padding: 1rem 1.25rem;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  border-left: 7px solid #fd484c;
+  align-items: center; 
+  gap: 1rem;
 }
-
+.glow-border {
+  border: 1px solid #00AFFF;
+  box-shadow: 0 0 20px rgba(0, 175, 255, 0.3);
+  animation: subtleGlow 2.5s infinite ease-in-out;
+}
+.alert-indicator {
+  width: 8px;
+  height: 60px; 
+  background: #FFD600; 
+  border-radius: 4px;
+  box-shadow: 0 0 10px #FFD600;
+}
+.alert-content {
+  flex-grow: 1; 
+}
 .alert-message {
-  font-size: 1.22rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #d2691e;
-  margin-bottom: 8px;
+  color: #FFD600; 
+  margin-bottom: 0.5rem;
 }
-
 .alert-date-time {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
-  margin-top: 5px;
+  gap: 1rem; 
 }
-
 .alert-date {
-  font-size: 1.07rem;
-  font-weight: 700;
-  color: #a87e29;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #9eaecf;
 }
-
 .alert-time {
-  font-size: 0.98rem;
-  color: #b88639;
+  font-size: 0.9rem;
+  color: #5a6b8c;
   font-weight: 500;
 }
 
+/*BOTÓN DE WHATSAPP */
 .whatsapp-link-btn {
-  display: flex;
-  align-items: center;
-  border: 2px solid #18e251;
-  background: #f6fff7;
-  border-radius: 8px;
-  padding: 7px 12px;
-  font-weight: bold;
-  color: #14b223;
-  margin-top: 13px;
-  margin-bottom: 7px;
+  background: #25D366;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   text-decoration: none;
-  font-size: 1.1rem;
-  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
-  box-shadow: 0 2px 9px #90ffa95c;
+  text-align: center;
+  transition: all 0.2s ease;
+  white-space: nowrap; /* Evita que el texto se parta */
 }
 .whatsapp-link-btn:hover {
-  background: #eaffea;
-  color: #198a0e;
-  box-shadow: 0 4px 17px #baffbe5c;
+  background: #1DA851;
+  box-shadow: 0 0 15px rgba(37, 211, 102, 0.5);
+  transform: translateY(-2px);
 }
+/* (Ya no necesitamos .wa-icon ni .whatsapp-link-btn span) */
 
-.wa-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 7px;
-}
 
+/* --- Barra de Navegación "Pepa" --- */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100vw;
-  background: #fffaf3;
+  background: #0f1422;
+  border-top: 1px solid #1f2a47;
   display: flex;
   justify-content: space-around;
   align-items: center;
   height: 70px;
-  box-shadow: 0 0 32px #ffbe955e;
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
   z-index: 10;
-  border-radius: 24px 24px 0 0;
 }
-
 .nav-btn {
-  background: none;
-  border: none;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0;
-  font-size: 1rem;
-  color: #a88547;
-  font-weight: bold;
-  transition: color .2s;
+  gap: 4px;
+  justify-content: center;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #5a6b8c;
+  transition: color 0.2s;
+  border: none;
+  background: none;
 }
-
-.nav-btn.active,
-.nav-btn:active {
-  color: #ff9100;
+.nav-btn .nav-icon {
+  height: 24px;
+  width: 24px;
+  filter: invert(39%) sepia(21%) saturate(546%) hue-rotate(179deg) brightness(91%) contrast(85%);
+  transition: filter 0.2s ease;
 }
-
-.nav-btn img {
-  height: 32px;
-  margin-bottom: 2px;
+.nav-btn:hover {
+  color: #FFFFFF;
 }
-
-@media (max-width: 480px) {
-  .history-container {
-    padding-bottom: 110px;
-  }
+.nav-btn:hover .nav-icon {
+  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(102%) contrast(102%);
+}
+.nav-btn.active {
+  color: #00AFFF;
+}
+.nav-btn.active .nav-icon {
+  filter: invert(57%) sepia(99%) saturate(4179%) hue-rotate(167deg) brightness(101%) contrast(101%);
 }
