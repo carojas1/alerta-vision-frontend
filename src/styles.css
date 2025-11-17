@@ -1,177 +1,102 @@
 /*
   ¡ESTO ARREGLA LOS INPUTS BLANCOS!
+  Y define los colores para los dos temas.
 */
+
 html, body, * {
   font-family: 'Inter', Arial, Helvetica, sans-serif !important;
   box-sizing: border-box;
 }
 
+/* --- TEMA PEPA (OSCURO) POR DEFECTO --- */
+:root {
+  --color-bg: #000000;
+  --color-bg-card: #0f1422;
+  --color-border: #1f2a47;
+  --color-grid: rgba(0, 175, 255, 0.07);
+  --color-glow: rgba(0, 110, 255, 0.1);
+  --color-glow-border: #00AFFF;
+  --color-glow-shadow: rgba(0, 175, 255, 0.3);
+
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #9eaecf;
+  --color-text-tertiary: #5a6b8c;
+  
+  --color-primary: #00AFFF;
+  --color-primary-hover: #0077FF; /* Más oscuro para Modo Claro */
+  --color-accent-yellow: #FFD600;
+  --color-accent-green: #25D366;
+  --color-accent-green-bg: rgba(37, 211, 102, 0.1);
+  --color-accent-green-hover: #1DA851;
+  
+  --color-input-bg: #080c14;
+  --color-input-border: #2a3b5f;
+  
+  --color-btn-gradient: linear-gradient(90deg, #00AFFF 0%, #0077FF 100%);
+  --color-btn-gradient-hover: linear-gradient(90deg, #00BFFF 0%, #0088FF 100%);
+  --color-btn-secondary-bg: transparent;
+  --color-btn-secondary-border: var(--color-border);
+  --color-btn-secondary-text: var(--color-text-secondary);
+  --color-btn-secondary-hover-bg: var(--color-border);
+  --color-btn-secondary-hover-text: var(--color-text-primary);
+  
+  --color-btn-disabled: #1a2233;
+  --color-btn-disabled-text: var(--color-text-tertiary);
+  
+  --color-nav-icon: invert(39%) sepia(21%) saturate(546%) hue-rotate(179deg) brightness(91%) contrast(85%);
+  --color-nav-icon-active: invert(57%) sepia(99%) saturate(4179%) hue-rotate(167deg) brightness(101%) contrast(101%);
+  
+  --logo-filter: brightness(0) invert(1);
+}
+
+/* --- ¡NUEVO TEMA LIMPIO "PEPA" (Blanco/Azul) (image_2aa4bd.jpg)! --- */
+body.light-mode {
+  --color-bg: #EAF0F6; /* Fondo Blanco Grisáceo (de la imagen 1) */
+  --color-bg-card: #FFFFFF; /* Tarjeta Blanca */
+  --color-border: #D8E2ED; /* Borde muy suave (de la imagen 1) */
+  --color-grid: rgba(0, 175, 255, 0.07);
+  --color-glow: rgba(0, 175, 255, 0.1); /* Sombra Azul */
+  --color-glow-border: #00AFFF;
+  --color-glow-shadow: rgba(0, 175, 255, 0.2);
+
+  --color-text-primary: #1a2233; /* Negro azulado */
+  --color-text-secondary: #5a6b8c; /* Gris azulado */
+  --color-text-tertiary: #9eaecf; /* Gris claro */
+  
+  --color-primary: #00AFFF; /* Azul "Pepa" */
+  --color-primary-hover: #0077FF; /* Azul más oscuro */
+  --color-accent-yellow: #E6A100; /* Amarillo oscuro */
+  --color-accent-green: #1DA851; /* Verde oscuro */
+  --color-accent-green-bg: rgba(29, 168, 81, 0.1);
+  --color-accent-green-hover: #178a42;
+  
+  --color-input-bg: #F4F7FA; /* Input Gris (como en la foto) */
+  --color-input-border: #F4F7FA; /* Sin borde */
+  
+  --color-btn-gradient: linear-gradient(90deg, #00AFFF 0%, #0077FF 100%);
+  --color-btn-gradient-hover: linear-gradient(90deg, #00BFFF 0%, #0088FF 100%);
+  
+  /* ¡ARREGLO DE BOTONES DESORGANIZADOS (image_2ab6ad.png)! */
+  --color-btn-secondary-bg: #F4F7FA; /* Botón "Reintentar" */
+  --color-btn-secondary-border: #F4F7FA;
+  --color-btn-secondary-text: var(--color-text-secondary);
+  --color-btn-secondary-hover-bg: #E0E7F1;
+  --color-btn-secondary-hover-text: var(--color-text-primary);
+  
+  --color-btn-disabled: #E0E7F1;
+  --color-btn-disabled-text: var(--color-text-secondary);
+  
+  /* ¡ARREGLO DE FILTRO DE ÍCONOS! */
+  --color-nav-icon: invert(60%) sepia(13%) saturate(1000%) hue-rotate(179deg) brightness(97%) contrast(87%);
+  --color-nav-icon-active: invert(57%) sepia(99%) saturate(4179%) hue-rotate(167deg) brightness(101%) contrast(101%);
+  
+  --logo-filter: none; /* Logo original (oscuro) */
+}
+
+/* --- Transición suave --- */
 body {
-  /* Fondo negro global (MODO PEPA POR DEFECTO) */
-  background: #000000;
+  background: var(--color-bg);
   margin: 0;
   padding: 0;
   transition: background 0.3s ease;
-}
-
-/*
-  ======================================================
-  === ¡AQUÍ COMIENZA EL MODO CLARO (BEIGE/MARRÓN)! ===
-  ======================================================
-  (Todo esto "aplasta" al modo pepa cuando el body tiene la clase .light-mode)
-*/
-
-/* --- 1. Fondo Global --- */
-body.light-mode {
-  background: #f6efe6; /* Fondo Beige */
-}
-
-/* --- 2. Contenedores de Página --- */
-body.light-mode .login-bg,
-body.light-mode .register-bg,
-body.light-mode .home-container,
-body.light-mode .history-container,
-body.light-mode .reports-container {
-  background: #f6efe6; /* Fondo Beige */
-  /* Quitamos la rejilla pepa */
-  background-image: none;
-}
-
-/* --- 3. Tarjetas (Login, Home, Historial, Reportes) --- */
-body.light-mode .login-card,
-body.light-mode .register-card,
-body.light-mode .status-card,
-body.light-mode .alert-item,
-body.light-mode .chart-card,
-body.light-mode .kpi,
-body.light-mode .export,
-body.light-mode .settings-section {
-  background: #fffdfa; /* Fondo Tarjeta Clara */
-  border: 1px solid #e1c8a3;
-  box-shadow: 0 8px 32px rgba(120, 84, 29, 0.10);
-  /* Quitamos la animación "pepa" */
-  animation: none;
-}
-
-/* --- 4. Títulos y Texto --- */
-body.light-mode .login-title,
-body.light-mode .register-title,
-body.light-mode .greeting,
-body.light-mode .status-card h2,
-body.light-mode .title,
-body.light-mode .settings-title,
-body.light-mode .kpi .value,
-body.light-mode .history-title {
-  color: #965813; /* Marrón oscuro */
-}
-body.light-mode .status-card .subtitle,
-body.light-mode .setting-item span,
-body.light-mode .alert-date {
-  color: #83551b; /* Marrón medio */
-}
-body.light-mode .subtitle-small,
-body.light-mode .kpi .label,
-body.light-mode .alert-time,
-body.light-mode .empty,
-body.light-mode .loading {
-  color: #ba9c68; /* Marrón claro */
-}
-
-/* --- 5. Inputs (Login, Reportes) --- */
-body.light-mode .input-group input,
-body.light-mode .export input {
-  background: #f3f1ed;
-  border: 1.5px solid #e1c8a3;
-  color: #3d260b;
-}
-body.light-mode .input-group input:focus,
-body.light-mode .export input:focus {
-  background: #fff;
-  border: 1.5px solid #cfa764;
-  box-shadow: none; /* Quitamos sombra pepa */
-}
-body.light-mode .input-group input::placeholder {
-  color: #ba9c68;
-}
-
-/* --- 6. Botones (Login, Home, Reportes) --- */
-body.light-mode .login-btn,
-body.light-mode .register-btn,
-body.light-mode .logout-btn,
-body.light-mode .action-btn.primary,
-body.light-mode .export button {
-  /* Gradiente Marrón */
-  background: linear-gradient(94deg, #bc873a 60%, #f8e8c2 100%);
-  color: #623b08;
-  box-shadow: 0 1.5px 9px rgba(120,84,29,0.06);
-  animation: none; /* Quitamos pulso pepa */
-}
-body.light-mode .login-btn:hover,
-body.light-mode .register-btn:hover,
-body.light-mode .logout-btn:hover,
-body.light-mode .action-btn.primary:hover,
-body.light-mode .export button:hover {
-  background: linear-gradient(91deg, #a5731b 80%, #d8bb7f 100%);
-  color: #fff;
-  transform: none;
-}
-body.light-mode .action-btn.secondary {
-  background: transparent;
-  border: 1px solid #e1c8a3;
-  color: #965813;
-}
-body.light-mode .action-btn.secondary:hover {
-  background: #f3f1ed;
-  color: #6b4a2e;
-}
-
-/* --- 7. Barra de Navegación --- */
-body.light-mode .bottom-nav,
-body.light-mode .nav-bottom {
-  background: #fffaf3;
-  box-shadow: 0 0 32px #ffbe955e;
-  border-top: 1px solid #e1c8a3;
-}
-body.light-mode .nav-btn {
-  color: #a88547; /* Color inactivo */
-}
-body.light-mode .nav-btn .nav-icon {
-  filter: invert(60%) sepia(30%) saturate(600%) hue-rotate(350deg); /* Tinte marrón */
-}
-body.light-mode .nav-btn.active {
-  color: #ff9100; /* Color activo */
-}
-body.light-mode .nav-btn.active .nav-icon {
-  filter: invert(60%) sepia(100%) saturate(1000%) hue-rotate(360deg); /* Tinte naranja */
-}
-
-/* --- 8. Elementos Específicos "Pepa" --- */
-body.light-mode .alert-indicator {
-  background: #fd484c; /* Rojo/Naranja */
-  box-shadow: 0 0 10px #fd484c;
-}
-body.light-mode .alert-message {
-  color: #d2691e; /* Naranja oscuro */
-}
-body.light-mode .tabs {
-  background: #fffdfa;
-  border: 1px solid #e1c8a3;
-}
-body.light-mode .tab {
-  background: #f3f1ed;
-  color: #a88547;
-}
-body.light-mode .tab.active {
-  background: #eabf8a;
-  color: #623b08;
-  box-shadow: none;
-}
-body.light-mode .contact-link {
-  color: #965813;
-}
-body.light-mode .toggle-switch .slider {
-  background-color: #e1c8a3; /* Apagado */
-}
-body.light-mode input:checked + .slider {
-  background-color: #bc873a; /* Encendido */
 }

@@ -4,11 +4,15 @@
   <div class="alert-list">
     <div 
       class="alert-item glow-border" 
-      *ngFor="let alert of alerts" 
-      >
+      *ngFor="let alert of alerts">
+      
       <div class="alert-indicator"></div>
+
       <div class="alert-content">
-        <div class="alert-message">{{ alert.message }}</div>
+        <div class="alert-message">
+          {{ alert.message }}
+        </div>
+
         <div class="alert-date-time">
           <span class="alert-date">
             {{ formatDateTime(alert.created_at || alert.createdAt).fecha }}
@@ -18,12 +22,12 @@
           </span>
         </div>
       </div>
+
       <a
         *ngIf="loggedInUserPhone"
         class="whatsapp-link-btn"
         [href]="'https://wa.me/' + loggedInUserPhone + '?text=' + encode(alert.message)"
-        target="_blank"
-      >
+        target="_blank">
         Mandar al Número
       </a>
     </div>
@@ -34,10 +38,12 @@
       <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />
       <span>Inicio</span>
     </div>
+
     <div class="nav-btn active" (click)="goTo('history')">
       <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
       <span>Alertas</span>
     </div>
+
     <div class="nav-btn" (click)="goTo('reports')">
       <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
       <span>Reportes</span>

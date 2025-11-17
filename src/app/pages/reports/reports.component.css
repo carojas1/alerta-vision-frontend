@@ -1,40 +1,28 @@
-/* === Estilo Reportes "Pepa" (Basado en image_29d2c8.jpg) === */
-
-/* --- Keyframes para Animaciones --- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- Estilos del Componente --- */
+/* === Reportes CSS con Variables === */
 .reports-container {
   min-height: 100vh;
-  background: #000000;
-  padding: 1.5rem 1rem 100px 1rem; /* Espacio para nav */
+  background: var(--color-bg);
+  padding: 1.5rem 1rem 100px 1rem;
   background-image: 
-    linear-gradient(rgba(0, 175, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 175, 255, 0.07) 1px, transparent 1px);
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
   background-size: 30px 30px;
-  animation: fadeIn 0.5s ease-out;
 }
-
 .title {
-  color: #FFFFFF;
+  color: var(--color-text-primary);
   font-size: 2rem;
   font-weight: 800;
   text-align: center;
   margin: 1rem 0 2rem 0;
 }
-
-/* Tabs "Pepa" */
 .tabs {
   display: flex;
   gap: 10px;
   margin-bottom: 12px;
-  background: #0f1422;
+  background: var(--color-bg-card);
   border-radius: 12px;
   padding: 6px;
-  border: 1px solid #1f2a47;
+  border: 1px solid var(--color-border);
 }
 .tab {
   flex: 1;
@@ -42,29 +30,25 @@
   border-radius: 8px;
   border: none;
   background: transparent;
-  color: #9eaecf;
+  color: var(--color-text-secondary);
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 .tab.active {
-  background: #00AFFF;
+  background: var(--color-primary);
   color: #FFFFFF;
-  box-shadow: 0 0 15px rgba(0, 175, 255, 0.3);
+  box-shadow: 0 0 15px var(--color-glow-shadow);
 }
-
-/* Gráfica "Pepa" */
 .chart-card {
-  background: #0f1422;
-  border: 1px solid #1f2a47;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 14px;
   margin: 12px 0;
-  box-shadow: 0 8px 32px rgba(0, 110, 255, 0.1);
+  box-shadow: 0 8px 32px var(--color-glow);
 }
-
-/* KPIs "Pepa" */
 .kpis {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -72,53 +56,52 @@
   margin: 12px 0;
 }
 .kpi {
-  background: #0f1422;
-  border: 1px solid #1f2a47;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1rem;
   text-align: center;
 }
 .kpi .label {
   font-size: 0.9rem;
-  color: #5a6b8c;
+  color: var(--color-text-tertiary);
   margin-bottom: 0.5rem;
 }
 .kpi .value {
   font-size: 2rem;
   font-weight: 700;
-  color: #FFFFFF;
+  color: var(--color-text-primary);
 }
-
-/* Exportar "Pepa" */
 .export {
   display: flex;
   gap: 10px;
   align-items: center;
   margin-top: 12px;
-  background: #0f1422;
-  border: 1px solid #1f2a47;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1rem;
 }
 .export input {
   flex: 1;
-  background: #080c14;
-  border: 1.5px solid #2a3b5f;
+  background: var(--color-input-bg);
+  border: 1.5px solid var(--color-input-border);
   border-radius: 10px;
   padding: 0.8rem 1rem;
   font-size: 1rem;
   outline: none;
-  color: #E0E0E0;
+  color: var(--color-text-primary);
   transition: all 0.15s;
+  box-shadow: none;
 }
 .export input:focus {
-  border: 1.5px solid #00AFFF;
-  box-shadow: 0 0 10px rgba(0, 175, 255, 0.5);
+  border: 1.5px solid var(--color-primary);
+  box-shadow: 0 0 10px var(--color-glow-shadow);
 }
 .export button {
   border: 0;
   border-radius: 10px;
-  background: linear-gradient(90deg, #00AFFF 0%, #0077FF 100%);
+  background: var(--color-btn-gradient);
   color: #FFFFFF;
   padding: 0.8rem 1.2rem;
   font-weight: 700;
@@ -126,35 +109,33 @@
   transition: all 0.2s ease;
 }
 .export button:hover {
-  box-shadow: 0 0 15px rgba(0, 175, 255, 0.3);
+  box-shadow: 0 0 15px var(--color-glow-shadow);
 }
 .export button:disabled {
-  background: #1a2233;
-  color: #5a6b8c;
+  background: var(--color-btn-disabled);
+  color: var(--color-btn-disabled-text);
   cursor: not-allowed;
 }
 .export-msg {
   margin-top: 0.5rem;
-  color: #00AFFF;
+  color: var(--color-primary);
   text-align: center;
   width: 100%;
 }
-
-/* --- ¡NUEVO CSS PARA AJUSTES! --- */
 .settings-section {
-  background: #0f1422;
-  border: 1px solid #1f2a47;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 1rem 1.5rem 1.5rem 1.5rem;
   margin: 2rem 0 12px 0;
 }
 .settings-title {
-  color: #FFFFFF;
+  color: var(--color-text-primary);
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0.5rem 0 1.5rem 0;
   text-align: left;
-  border-bottom: 1px solid #1f2a47;
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 1rem;
 }
 .setting-item {
@@ -164,7 +145,7 @@
   margin-bottom: 1.5rem;
 }
 .setting-item span {
-  color: #E0E0E0;
+  color: var(--color-text-primary);
   font-weight: 600;
   font-size: 1rem;
 }
@@ -174,7 +155,7 @@
   gap: 0.5rem;
 }
 .contact-link {
-  color: #00AFFF;
+  color: var(--color-primary);
   font-weight: 600;
   text-decoration: none;
   font-size: 1rem;
@@ -182,8 +163,6 @@
 .contact-link:hover {
   text-decoration: underline;
 }
-
-/* Toggle Switch "Pepa" */
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -202,7 +181,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #2a3b5f; /* Color apagado */
+  background-color: var(--color-input-border); /* Apagado */
   transition: .4s;
   border-radius: 28px;
 }
@@ -218,33 +197,28 @@
   border-radius: 50%;
 }
 input:checked + .slider {
-  background-color: #00AFFF; /* Color "pepa" encendido */
+  background-color: var(--color-primary); /* Encendido */
 }
 input:checked + .slider:before {
   transform: translateX(22px);
 }
-/* --- FIN DE CSS PARA AJUSTES --- */
-
-
 .loading {
   text-align: center;
   margin-top: 10px;
-  color: #9eaecf;
+  color: var(--color-text-secondary);
 }
 .empty {
   text-align: center;
   margin: 10px 0;
-  color: #5a6b8c;
+  color: var(--color-text-tertiary);
 }
-
-/* --- ¡NUEVA BARRA DE NAVEGACIÓN "PEPA"! --- */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100vw;
-  background: #0f1422;
-  border-top: 1px solid #1f2a47;
+  background: var(--color-bg-card);
+  border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -262,7 +236,7 @@ input:checked + .slider:before {
   cursor: pointer;
   font-weight: 600;
   font-size: 0.8rem;
-  color: #5a6b8c;
+  color: var(--color-text-tertiary);
   transition: color 0.2s;
   border: none;
   background: none;
@@ -270,18 +244,18 @@ input:checked + .slider:before {
 .nav-btn .nav-icon {
   height: 24px;
   width: 24px;
-  filter: invert(39%) sepia(21%) saturate(546%) hue-rotate(179deg) brightness(91%) contrast(85%);
+  filter: var(--color-nav-icon);
   transition: filter 0.2s ease;
 }
 .nav-btn:hover {
-  color: #FFFFFF;
+  color: var(--color-text-primary);
 }
 .nav-btn:hover .nav-icon {
-  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(102%) contrast(102%);
+  filter: var(--color-nav-icon-active);
 }
 .nav-btn.active {
-  color: #00AFFF;
+  color: var(--color-primary);
 }
 .nav-btn.active .nav-icon {
-  filter: invert(57%) sepia(99%) saturate(4179%) hue-rotate(167deg) brightness(101%) contrast(101%);
+  filter: var(--color-nav-icon-active);
 }

@@ -5,14 +5,13 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { routes } from './app.routes';
 
-// ¡ESTA LÍNEA ES LA CLAVE!
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'; 
+// ¡YA NO IMPORTAMOS NADA DE ANIMATIONS!
 
 export const appConfig: ApplicationConfig = {
   providers: [
     importProvidersFrom(BrowserModule, FormsModule, ReactiveFormsModule),
     provideHttpClient(withFetch()),     // Arregla el error NG02801 (fetch)
     provideRouter(routes),
-    provideAnimationsAsync()          // ¡ESTA LÍNEA ARREGLA LA ANIMACIÓN (NG05105)!
+    // ¡YA NO 'ENCENDEMOS' LAS ANIMACIONES!
   ],
 };

@@ -1,52 +1,16 @@
-/* === Estilo Registro "Ultra-Moderno" (Negro/Azul) === */
-
-/* --- 1. Definición de Animaciones (Keyframes) --- */
-
-@keyframes fadeInCard {
-  from {
-    opacity: 0;
-    transform: translateY(-15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shakeError {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
-  20%, 40%, 60%, 80% { transform: translateX(6px); }
-}
-
-/* ¡ANIMACIÓN "PEPA" PARA EL BOTÓN! */
-@keyframes subtleGlow {
-  0%   { box-shadow: 0 4px 15px rgba(0, 175, 255, 0.2); }
-  50%  { box-shadow: 0 6px 30px rgba(0, 175, 255, 0.5); }
-  100% { box-shadow: 0 4px 15px rgba(0, 175, 255, 0.2); }
-}
-
-
-/* --- 2. Estilos del Componente --- */
-
+/* === Register CSS con Variables (Idéntico a Login) === */
 .register-bg {
   min-height: 100vh;
-  /* Fondo: Negro profundo */
-  background: #000000;
+  background: var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Inter', Arial, sans-serif;
 }
-
 .register-card {
-  /* Fondo: Un gris azulado muy oscuro */
-  background: #0f1422;
+  background: var(--color-bg-card);
   border-radius: 20px;
-  /* Borde: Un borde sutil que define la tarjeta */
-  border: 1px solid #1f2a47;
-  /* Sombra: Un 'glow' o brillo azulado sutil */
-  box-shadow: 0 8px 32px rgba(0, 110, 255, 0.1);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 8px 32px var(--color-glow);
   padding: 2.3rem 2rem 2rem 2rem;
   max-width: 400px;
   width: 97vw;
@@ -54,38 +18,19 @@
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
-  /* Animación de entrada */
-  animation: fadeInCard 0.5s ease-out forwards;
 }
-
-.logo-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-}
-
 .logo {
-  /* Logo grande */
   width: 170px;
   margin-bottom: 0.1rem;
-  
-  /* --- ¡ARREGLO DEL LOGO NEGRO! --- */
-  /* Esto fuerza al logo negro a volverse blanco */
-  filter: brightness(0) invert(1);
+  filter: var(--logo-filter);
 }
-
 .register-title {
-  /* Color: Blanco puro */
-  color: #FFFFFF;
+  color: var(--color-text-primary);
   font-size: 2.1rem;
   font-weight: 800;
   margin-top: 0.3rem;
   margin-bottom: 1.1rem;
-  letter-spacing: .3px;
-  font-family: 'Inter', Arial, sans-serif;
-  text-shadow: none;
 }
-
 .input-group {
   width: 100%;
   margin-bottom: 0.19rem;
@@ -93,159 +38,82 @@
   display: flex;
   align-items: center;
 }
-
-/* ESTO ARREGLA LOS INPUTS (porque ya no pelea con styles.css) */
 .input-group input {
-  /* Fondo: Un tono oscuro */
-  background: #080c14;
-  /* Borde: Un borde azulado muy sutil */
-  border: 1.5px solid #2a3b5f;
+  background: var(--color-input-bg);
+  border: 1.5px solid var(--color-input-border);
   border-radius: 10px;
   padding: 1rem 1.1rem;
   font-size: 1.1rem;
   width: 100%;
   outline: none;
-  /* Color: Texto claro */
-  color: #E0E0E0;
-  transition: border 0.13s, background 0.12s, box-shadow 0.15s;
-  font-family: inherit;
+  color: var(--color-text-primary);
+  transition: all 0.15s;
   box-shadow: none;
 }
-
 .input-group input:focus {
-  background: #080c14;
-  /* Borde: ¡El Azul Eléctrico cuando está activo! */
-  border: 1.5px solid #00AFFF;
-  /* Sombra: Un 'glow' azulado */
-  box-shadow: 0 0 10px rgba(0, 175, 255, 0.5);
+  border: 1.5px solid var(--color-primary);
+  box-shadow: 0 0 10px var(--color-glow-shadow);
 }
-
 .input-group input::placeholder {
-  /* Color: Un gris azulado */
-  color: #5a6b8c;
-  font-weight: 400;
+  color: var(--color-text-secondary);
 }
-
-.password-group {
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
 .eye-btn {
-  position: absolute;
-  right: 10px;
-  top: 50%;
+  position: absolute; right: 10px; top: 50%;
   transform: translateY(-50%);
-  background: none;
-  border: none;
-  outline: none;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  height: 30px;
-  width: 30px;
+  background: none; border: none; outline: none; padding: 0;
+  display: flex; align-items: center; cursor: pointer;
+  height: 30px; width: 30px;
 }
-
 .eye-icon {
-  width: 25px;
-  height: 25px;
-  /* Tinte: gris azulado */
+  width: 25px; height: 25px;
   filter: invert(50%) sepia(13%) saturate(1477%) hue-rotate(183deg) brightness(97%) contrast(87%);
-  transition: filter .12s;
 }
-
-.eye-btn:hover .eye-icon {
-  /* Tinte Hover: Azul Eléctrico */
-  filter: invert(57%) sepia(99%) saturate(4179%) hue-rotate(167deg) brightness(101%) contrast(101%);
+body.light-mode .eye-icon {
+  filter: none;
 }
-
-.error-message {
-  /* Color: ¡Amarillo Neón para alertas! */
-  color: #FFD600;
-  font-size: 1.09rem;
-  margin-bottom: 9px;
-  margin-top: -5px;
-  min-height: 20px;
-  text-align: center;
-  animation: shakeError 0.4s ease-in-out forwards;
-}
-
-/* ESTO ARREGLA EL BOTÓN (porque ya no pelea con styles.css) */
 .register-btn {
-  width: 100%;
-  padding: 1.08rem 0;
-  /* Fondo: ¡El gradiente Azul Eléctrico! */
-  background: linear-gradient(90deg, #00AFFF 0%, #0077FF 100%);
+  width: 100%; padding: 1.08rem 0;
+  background: var(--color-btn-gradient);
   color: #FFFFFF;
-  border: none;
-  border-radius: 11px;
-  font-weight: 800;
-  font-size: 1.18rem;
-  margin-top: 0.9rem;
-  transition: all 0.2s ease-out;
-  letter-spacing: .2px;
-  box-shadow: 0 4px 15px rgba(0, 175, 255, 0.2);
-  opacity: 1;
+  border: none; border-radius: 11px;
+  font-weight: 800; font-size: 1.18rem;
+  margin-top: 0.9rem; transition: all 0.2s ease-out;
+  box-shadow: 0 4px 15px var(--color-glow-shadow);
 }
-
 .register-btn:disabled {
-  background: #1a2233;
-  color: #5a6b8c;
-  opacity: 1;
-  cursor: not-allowed;
-  box-shadow: none;
-  animation: none;
+  background: var(--color-btn-disabled);
+  color: var(--color-btn-disabled-text);
+  cursor: not-allowed; box-shadow: none;
 }
-
-.register-btn:not(:disabled) {
-  /* ¡AQUÍ APLICAMOS LA ANIMACIÓN "PEPA"! */
-  animation: subtleGlow 2.5s infinite ease-in-out;
-}
-
 .register-btn:not(:disabled):hover {
-  background: linear-gradient(90deg, #00BFFF 0%, #0088FF 100%);
-  color: #FFFFFF;
-  box-shadow: 0 6px 30px rgba(0, 175, 255, 0.4);
+  background: var(--color-btn-gradient-hover);
+  box-shadow: 0 6px 20px var(--color-glow-shadow);
   transform: translateY(-2px);
-  animation-play-state: paused;
 }
-
+.error-message {
+  color: var(--color-accent-yellow);
+  font-size: 1.09rem; margin: -5px 0 9px 0;
+  min-height: 20px; text-align: center;
+}
 .login-link {
-  margin-top: 1.1rem;
-  font-size: 1.10rem;
-  /* Color: Texto secundario gris azulado */
-  color: #9eaecf;
-  font-family: 'Inter', Arial, sans-serif;
+  margin-top: 1.1rem; font-size: 1.10rem;
+  color: var(--color-text-secondary);
 }
 .login-link a {
-  /* Color: El enlace clicable Azul Eléctrico */
-  color: #00AFFF;
-  font-weight: 700;
-  text-decoration: none;
-  margin-left: 3px;
-  transition: color 0.15s;
+  color: var(--color-primary);
+  font-weight: 700; text-decoration: none;
+  margin-left: 3px; position: relative; padding-bottom: 3px;
 }
-.login-link a:hover { color: #33CFFF; }
-
-@media (max-width: 600px) {
-  .register-card {
-    padding: 1.1rem 0.3rem;
-    border-radius: 1.1rem;
-    max-width: 99vw;
-    /* Inmersivo en móvil */
-    background: none;
-    border: none;
-    box-shadow: none;
-  }
-  .logo {
-    width: 100px; /* Logo más chico en móvil */
-  }
-  .register-title {
-    font-size: 1.18rem;
-  }
-  .register-btn {
-    font-size: 1rem;
-  }
+.login-link a::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 100%; height: 2px;
+  background-color: var(--color-primary-hover);
+  transform: scaleX(0); transform-origin: center;
+  transition: transform 0.3s ease-out;
+}
+.login-link a:hover {
+  color: var(--color-primary-hover);
+}
+.login-link a:hover::after {
+  transform: scaleX(1);
 }

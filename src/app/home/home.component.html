@@ -1,5 +1,4 @@
 <div class="home-container">
-  
   <div class="header">
     <img src="/logo-alertavision.png" class="logo" alt="AlertaVisión" />
     <button class="logout-btn" (click)="logout()">
@@ -14,12 +13,12 @@
   <div class="status-card glow-border">
     <h2>Detectando fatigas</h2>
     <p class="subtitle">Mantén la concentratión</p>
-    
+
     <div class="progress-bar-container">
       <div class="progress-bar-fill" [style.width.%]="fatigaLevel"></div>
       <span class="progress-label">{{ fatigaLevel }}%</span>
     </div>
-    
+
     <button class="action-btn" (click)="onStartMonitoring()">
       Iniciar monitoréo
     </button>
@@ -28,27 +27,28 @@
 
   <div class="status-card">
     <h2>No se detectan los lentes</h2>
-    <p class="subtitle">Enciende tus lentes y acércalos para vincular.</p>
-    
+    <p class="subtitle">
+      Enciende tus lentes y acércalos para vincular.
+    </p>
+
     <div class="button-group">
       <button class="action-btn secondary" (click)="onRetry()">Reitentar</button>
       <button class="action-btn primary" (click)="onConnectLenses()">Conectar</button>
     </div>
   </div>
-
 </div>
 
-<nav class="nav-bottom">
+<nav class="bottom-nav">
   <div class="nav-btn active" (click)="goTo('home')">
     <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />
     <span>Inicio</span>
   </div>
-  
+
   <div class="nav-btn" (click)="goTo('history')">
     <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
     <span>Alertas</span>
   </div>
-  
+
   <div class="nav-btn" (click)="goTo('reports')">
     <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
     <span>Reportes</span>

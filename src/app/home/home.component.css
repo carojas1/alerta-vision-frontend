@@ -1,29 +1,13 @@
-/* === Estilo Home "Pepa" (Basado en image_1d80e3.jpg) === */
-
-/* --- Keyframes para Animaciones --- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes subtleGlow {
-  0%   { box-shadow: 0 0 15px rgba(0, 175, 255, 0.3); }
-  50%  { box-shadow: 0 0 25px rgba(0, 175, 255, 0.7); }
-  100% { box-shadow: 0 0 15px rgba(0, 175, 255, 0.3); }
-}
-
-/* --- Estilos del Componente --- */
+/* === Home CSS con Variables === */
 .home-container {
   min-height: 100vh;
-  background: #000000;
-  padding: 1.5rem 1rem 100px 1rem; /* Espacio para nav */
+  background: var(--color-bg);
+  padding: 1.5rem 1rem 100px 1rem;
   background-image: 
-    linear-gradient(rgba(0, 175, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 175, 255, 0.07) 1px, transparent 1px);
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
   background-size: 30px 30px;
-  animation: fadeIn 0.5s ease-out;
 }
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -31,74 +15,68 @@
   width: 100%;
   margin-bottom: 1rem;
 }
-
 .logo {
   width: 140px;
-  /* ¡Truco para que el logo negro se vea blanco! */
-  filter: brightness(0) invert(1);
+  filter: var(--logo-filter);
 }
-
 .logout-btn {
   background: rgba(0, 175, 255, 0.1);
-  border: 1px solid #00AFFF;
-  color: #00AFFF;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
   padding: 0.5rem 1rem;
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.logout-btn:hover {
-  background: #00AFFF;
-  color: #000000;
+body.light-mode .logout-btn {
+  background: rgba(0, 122, 255, 0.1);
 }
-
+.logout-btn:hover {
+  background: var(--color-primary);
+  color: var(--color-bg-card);
+}
 .greeting {
-  color: #FFFFFF;
+  color: var(--color-text-primary);
   font-size: 2rem;
   font-weight: 800;
   text-align: center;
   margin: 1rem 0 2rem 0;
   line-height: 1.2;
 }
-
 .status-card {
-  background: #0f1422;
+  background: var(--color-bg-card);
   border-radius: 20px;
-  border: 1px solid #1f2a47;
+  border: 1px solid var(--color-border);
   padding: 1.5rem;
   width: 100%;
   margin-bottom: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 110, 255, 0.1);
+  box-shadow: 0 8px 32px var(--color-glow);
   text-align: center;
 }
-
 .glow-border {
-  border: 1px solid #00AFFF;
-  box-shadow: 0 0 20px rgba(0, 175, 255, 0.3);
-  animation: subtleGlow 2.5s infinite ease-in-out;
+  border: 1px solid var(--color-glow-border);
+  box-shadow: 0 0 20px var(--color-glow-shadow);
 }
-
 .status-card h2 {
-  color: #FFFFFF;
+  color: var(--color-text-primary);
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 0.25rem 0;
 }
 .status-card .subtitle {
-  color: #9eaecf;
+  color: var(--color-text-secondary);
   font-size: 1rem;
   margin: 0 0 1.5rem 0;
 }
 .status-card .subtitle-small {
-  color: #5a6b8c;
+  color: var(--color-text-tertiary);
   font-size: 0.9rem;
   margin: 0.5rem 0 0 0;
 }
-
 .progress-bar-container {
-  background: #080c14;
-  border: 1px solid #2a3b5f;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
   border-radius: 20px;
   height: 2.5rem;
   padding: 4px;
@@ -116,10 +94,9 @@
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #FFFFFF;
+  color: var(--color-text-primary);
   font-weight: 700;
 }
-
 .action-btn {
   width: 100%;
   padding: 1rem 0;
@@ -128,47 +105,45 @@
   font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  border: none;
 }
 .action-btn.primary {
-  background: linear-gradient(90deg, #00AFFF 0%, #0077FF 100%);
+  background: var(--color-btn-gradient);
   color: #FFFFFF;
-  border: none;
-  box-shadow: 0 4px 15px rgba(0, 175, 255, 0.2);
+  box-shadow: 0 4px 15px var(--color-glow-shadow);
 }
 .action-btn.primary:hover {
-  box-shadow: 0 6px 30px rgba(0, 175, 255, 0.4);
+  box-shadow: 0 6px 30px var(--color-glow-shadow);
   transform: translateY(-2px);
 }
+/* ¡ARREGLO PARA BOTONES EN MODO CLARO (image_2ab6ad.png)! */
 .action-btn.secondary {
-  background: transparent;
-  border: 1px solid #1f2a47;
-  color: #9eaecf;
+  background: var(--color-btn-secondary-bg);
+  border: 1px solid var(--color-btn-secondary-border);
+  color: var(--color-btn-secondary-text);
 }
 .action-btn.secondary:hover {
-  background: #1f2a47;
-  color: #FFFFFF;
+  background: var(--color-btn-secondary-hover-bg);
+  color: var(--color-btn-secondary-hover-text);
 }
 .action-btn:disabled {
-  background: #1a2233;
-  color: #5a6b8c;
+  background: var(--color-btn-disabled);
+  color: var(--color-btn-disabled-text);
   cursor: not-allowed;
   opacity: 0.7;
 }
-
 .button-group {
   display: flex;
   gap: 1rem;
   margin-top: 1.5rem;
 }
-
-/* --- Barra de Navegación "Pepa" --- */
-.nav-bottom {
+.bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100vw;
-  background: #0f1422;
-  border-top: 1px solid #1f2a47;
+  background: var(--color-bg-card);
+  border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -176,7 +151,6 @@
   box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
   z-index: 10;
 }
-
 .nav-btn {
   flex: 1;
   display: flex;
@@ -187,30 +161,26 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 0.8rem;
-  color: #5a6b8c;
+  color: var(--color-text-tertiary);
   transition: color 0.2s;
   border: none;
   background: none;
 }
-
 .nav-btn .nav-icon {
   height: 24px;
   width: 24px;
-  filter: invert(39%) sepia(21%) saturate(546%) hue-rotate(179deg) brightness(91%) contrast(85%);
+  filter: var(--color-nav-icon);
   transition: filter 0.2s ease;
 }
-
 .nav-btn:hover {
-  color: #FFFFFF;
+  color: var(--color-text-primary);
 }
 .nav-btn:hover .nav-icon {
-  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(102%) contrast(102%);
+  filter: var(--color-nav-icon-active);
 }
-
 .nav-btn.active {
-  color: #00AFFF;
+  color: var(--color-primary);
 }
-
 .nav-btn.active .nav-icon {
-  filter: invert(57%) sepia(99%) saturate(4179%) hue-rotate(167deg) brightness(101%) contrast(101%);
+  filter: var(--color-nav-icon-active);
 }
