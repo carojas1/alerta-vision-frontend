@@ -1,4 +1,3 @@
-/* === Reportes CSS con Variables === */
 .reports-container {
   min-height: 100vh;
   background: var(--color-bg);
@@ -72,9 +71,12 @@
   font-weight: 700;
   color: var(--color-text-primary);
 }
+
+/* --- EXPORT SECTION (MODIFICADO) --- */
 .export {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 12px;
   align-items: center;
   margin-top: 12px;
   background: var(--color-bg-card);
@@ -82,46 +84,117 @@
   border-radius: 12px;
   padding: 1rem;
 }
-.export input {
+
+/* Botón grande "Enviar a mi correo" */
+.btn-quick {
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: #FFFFFF;
+  padding: 0.8rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px var(--color-glow-shadow);
+  
+  /* Flex para centrar verticalmente el texto */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.btn-quick .btn-label {
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+.btn-quick .btn-user-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.btn-quick .btn-user-email {
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.btn-quick:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+.btn-quick:disabled {
+  background: var(--color-btn-disabled);
+  color: var(--color-btn-disabled-text);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.separator-text {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+  width: 100%;
+  text-align: center;
+}
+
+/* Grupo manual */
+.manual-group {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.manual-group input {
   flex: 1;
   background: var(--color-input-bg);
   border: 1.5px solid var(--color-input-border);
   border-radius: 10px;
   padding: 0.8rem 1rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   outline: none;
   color: var(--color-text-primary);
   transition: all 0.15s;
   box-shadow: none;
 }
-.export input:focus {
+.manual-group input:focus {
   border: 1.5px solid var(--color-primary);
   box-shadow: 0 0 10px var(--color-glow-shadow);
 }
-.export button {
+.manual-group button {
   border: 0;
   border-radius: 10px;
-  background: var(--color-btn-gradient);
-  color: #FFFFFF;
+  background: var(--color-bg);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
   padding: 0.8rem 1.2rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.export button:hover {
-  box-shadow: 0 0 15px var(--color-glow-shadow);
+.manual-group button:hover {
+  background: var(--color-primary);
+  color: white;
 }
-.export button:disabled {
-  background: var(--color-btn-disabled);
+.manual-group button:disabled {
+  border-color: var(--color-btn-disabled);
   color: var(--color-btn-disabled-text);
   cursor: not-allowed;
+  background: transparent;
 }
+
 .export-msg {
   margin-top: 0.5rem;
   color: var(--color-primary);
   text-align: center;
   width: 100%;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
+/* --- FIN EXPORT SECTION --- */
+
 .settings-section {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);

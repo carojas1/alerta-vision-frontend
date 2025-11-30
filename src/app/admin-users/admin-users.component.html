@@ -1,46 +1,116 @@
-<div class="admin-users-container">
-  <img src="/logo-alertavision.png" alt="Alerta Visión" class="logo-alertavision" />
+<div class="dashboard-container">
+  
+  <div class="main-header">
+    <h2>Gestión de Usuarios Avanzada - AlertaVisión</h2>
+    <button class="btn-primary" (click)="openModal(undefined, 'info')">+ Nuevo Usuario</button>
+  </div>
 
-  <h1 class="admin-title">Gestión de Usuarios</h1>
-  <div class="admin-subtitle">Panel de administración de Alerta Visión</div>
-
-  <div class="tabla-scroll">
-    <table class="tabla-usuarios">
+  <div class="table-card">
+    <table class="styled-table" *ngIf="!isLoading">
       <thead>
         <tr>
-          <th>Correo electrónico</th>
-          <th>Teléfono</th>
-          <th>Rol</th>
-          <th>Eliminar</th>
+          <th>ID</th><th>Usuario</th><th>Email</th><th>Rol</th><th>Teléfono</th><th>Estado</th><th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let user of usuarios">
-          <td>{{ user.email }}</td>
-          <td>{{ user.telefono }}</td>
+          <td>{{ user.id }}</td>
           <td>
-            <span
-              [ngClass]="{
-                'badge-rol': true,
-                'admin': user.rol === 'admin',
-                'user': user.rol === 'usuario'
-              }"
-            >
-              {{ user.rol | titlecase }}
-            </span>
+            <div class="user-cell">
+              <div class="avatar">{{ getInitial(user.nombre) }}</div>
+              <strong>{{ user.nombre }}</strong>
+            </div>
           </td>
+          <td>{{ user.email }}</td>
+          <td><span class="badge role">{{ user.rol | uppercase }}</span></td>
+          <td>{{ user.telefono || '--' }}</td>
+          <td><span class="badge active">ACTIVO</span></td>
           <td>
-            <!-- Enviar SIEMPRE string (no number) -->
-            <button
-              class="btn-eliminar"
-              (click)="eliminarUsuario(user.id!)"
-              [disabled]="!user.id"
-            >
-              <img src="/icons8-trash.svg" alt="Eliminar" class="icon-delete" />
-            </button>
+            <div class="actions">
+              <button class="btn-icon" (click)="openModal(user, 'info')">✏️</button>
+              <button class="btn-icon" (click)="eliminarUsuario(user.id)">🗑️</button>
+              <button class="btn-icon view" (click)="openModal(user, 'historial')">👁️</button>
+              <button class="btn-icon chart" (click)="openModal(user, 'reportes')">📊</button>
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+</div>
+
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-card">
+    
+    <div class="modal-header">
+      <h3>Detalles: {{ currentUser.nombre }}</h3>
+      <button class="close-x" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-tabs">
+      <button [class.active]="currentTab === 'info'" (click)="cambiarPestana('info')">Información</button>
+      <button [class.active]="currentTab === 'historial'" (click)="cambiarPestana('historial')">Historial de Alertas</button>
+      <button [class.active]="currentTab === 'reportes'" (click)="cambiarPestana('reportes')">Informes / Gráficas</button>
+    </div>
+
+    <div class="modal-body">
+      
+      <div *ngIf="currentTab === 'info'" class="tab-content fade-in">
+        <div class="form-grid">
+          <div class="input-group">
+            <label>Nombre</label><input [(ngModel)]="currentUser.nombre">
+          </div>
+          <div class="input-group">
+            <label>Email</label><input [(ngModel)]="currentUser.email">
+          </div>
+          <div class="input-group">
+            <label>Teléfono</label><input [(ngModel)]="currentUser.telefono">
+          </div>
+          <div class="input-group">
+            <label>Rol</label>
+            <select [(ngModel)]="currentUser.rol">
+              <option value="usuario">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+        </div>
+        <div class="footer-actions">
+           <button class="btn-save" (click)="guardarUsuario()">Guardar Cambios</button>
+        </div>
+      </div>
+
+      <div *ngIf="currentTab === 'historial'" class="tab-content fade-in">
+        <div class="history-list">
+          <div class="alert-item" *ngFor="let item of alertas">
+            <div class="alert-bar"></div>
+            <div class="alert-info">
+              <span class="alert-msg">{{ item.mensaje }}</span>
+              <span class="alert-date">
+                {{ formatDateTime(item.created_at).fecha }} - {{ formatDateTime(item.created_at).hora }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="alertas.length === 0" class="empty-msg">No hay alertas registradas.</div>
+        </div>
+      </div>
+
+      <div *ngIf="currentTab === 'reportes'" class="tab-content fade-in">
+        <div class="reports-layout">
+          <div class="chart-container">
+            <h4>Nivel de Somnolencia (Últimos 7 días)</h4>
+            <div class="canvas-wrapper">
+              <canvas baseChart [data]="barData" [options]="barOptions" [type]="'bar'"></canvas>
+            </div>
+          </div>
+          <div class="kpi-container">
+            <div class="kpi-box"><span>Promedio</span><strong>{{ promedioDia }}</strong></div>
+            <div class="kpi-box"><span>Máximo</span><strong>{{ mejorDia }}</strong></div>
+            <div class="kpi-box"><span>Mínimo</span><strong>{{ peorDia }}</strong></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

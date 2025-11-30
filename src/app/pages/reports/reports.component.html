@@ -8,28 +8,17 @@
   </div>
   <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
 
+  <!-- GRÁFICAS -->
   <div class="chart-card" *ngIf="activeTab==='diario'">
-    <canvas baseChart
-      [type]="'bar'"
-      [data]="barData"
-      [options]="barOptions">
-    </canvas>
+    <canvas baseChart [type]="'bar'" [data]="barData" [options]="barOptions"></canvas>
     <div class="empty" *ngIf="!loading && (!barData.datasets[0].data || !barData.datasets[0].data.length)">Sin datos en este rango.</div>
   </div>
   <div class="chart-card" *ngIf="activeTab==='semanal'">
-    <canvas baseChart
-      [type]="'line'"
-      [data]="lineData"
-      [options]="lineOptions">
-    </canvas>
+    <canvas baseChart [type]="'line'" [data]="lineData" [options]="lineOptions"></canvas>
     <div class="empty" *ngIf="!loading && (!lineData.datasets[0].data || !lineData.datasets[0].data.length)">Sin datos en este rango.</div>
   </div>
   <div class="chart-card" *ngIf="activeTab==='mensual'">
-    <canvas baseChart
-      [type]="'doughnut'"
-      [data]="donutData"
-      [options]="donutOptions">
-    </canvas>
+    <canvas baseChart [type]="'doughnut'" [data]="donutData" [options]="donutOptions"></canvas>
     <div class="empty" *ngIf="!loading && (!donutData.datasets[0].data || !donutData.datasets[0].data.length)">Sin datos en este rango.</div>
   </div>
 
@@ -48,11 +37,29 @@
     </div>
   </div>
 
+  <!-- SECCIÓN DE EXPORTACIÓN -->
   <div class="export">
-    <input type="email" placeholder="tu@correo.com" [(ngModel)]="email">
-    <button (click)="exportarCorreo()" [disabled]="sending">
-      {{ sending ? 'Enviando…' : 'Enviar informe' }}
+    
+    <!-- 1. Botón Grande: "Enviar a mi correo" -->
+    <button class="btn-quick" (click)="exportarCorreoUsuario()" [disabled]="sending">
+      <ng-container *ngIf="!sending; else sendingTemplate">
+        <!-- Texto principal solicitado -->
+        <span class="btn-main-text">Enviar a mi correo</span>
+        <!-- Correo pequeño para confirmación visual -->
+        <span class="btn-sub-text">({{ userEmail || '...' }})</span>
+      </ng-container>
+      <ng-template #sendingTemplate>Enviando...</ng-template>
     </button>
+
+    <!-- 2. Separador -->
+    <div class="separator-text">o enviar a otro correo:</div>
+
+    <!-- 3. Opción Manual -->
+    <div class="manual-group">
+      <input type="email" placeholder="otro@correo.com" [(ngModel)]="email">
+      <button (click)="exportarCorreoManual()" [disabled]="sending">Enviar</button>
+    </div>
+
     <div class="export-msg" *ngIf="exportMsg">{{ exportMsg }}</div>
   </div>
 
@@ -74,9 +81,7 @@
     </div>
     <div class="setting-item contact">
       <span>Contacta con nosotros</span>
-      <a href="mailto:carojas@sudamericano.edu.ec" class="contact-link">
-        carojas&#64;sudamericano.edu.ec
-      </a>
+      <a href="mailto:carojas@sudamericano.edu.ec" class="contact-link">carojas&#64;sudamericano.edu.ec</a>
     </div>
   </div>
   <div *ngIf="loading" class="loading">Cargando…</div>
@@ -84,15 +89,12 @@
 
 <nav class="bottom-nav">
   <div class="nav-btn" (click)="goTo('home')">
-    <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />
-    <span>Inicio</span>
+    <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" /><span>Inicio</span>
   </div>
   <div class="nav-btn" (click)="goTo('history')">
-    <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
-    <span>Alertas</span>
+    <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" /><span>Alertas</span>
   </div>
   <div class="nav-btn active" (click)="goTo('reports')">
-    <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
-    <span>Reportes</span>
+    <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" /><span>Reportes</span>
   </div>
 </nav>
