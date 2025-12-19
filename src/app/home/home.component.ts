@@ -1,35 +1,46 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
+
 import { AuthService } from '../services/auth.service';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule, HttpClientModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
   userName = '';
-  fatigaLevel = 0; // Esta variable sí la usa el HTML "pepa"
+  userEmail = '';
+  fatigaLevel = 0;
   selectedTab = 'home';
-
-  // Para mantener sincronizado el tema con Reports / History
   isDarkMode = true;
+
+  showProfileModal = false;
+  editData: any = { nombre: '', telefono: '', email_recuperacion: '' };
+
+  // 🔌 Estado de los lentes
+  conectandoLentes = false;
+  lentesConectados = false;
+  errorConexionLentes = '';
+
+  // URL base de tu backend en Render
+  private backendBase = 'https://alerta-vision-backend.onrender.com';
 
   constructor(
     private router: Router,
     private auth: AuthService,
-    @Inject(DOCUMENT) private document: Document
+    private http: HttpClient,
+    @Inject(DOCUMENT) private document: Document,
   ) {}
 
   ngOnInit() {
-    // 🔥 LEER TEMA GUARDADO Y APLICARLO AL <body>
     if (typeof window !== 'undefined' && localStorage) {
       const savedTheme = localStorage.getItem('theme');
-
       if (savedTheme === 'light') {
         this.isDarkMode = false;
         this.document.body.classList.add('light-mode');
@@ -37,51 +48,98 @@ export class HomeComponent implements OnInit {
         this.isDarkMode = true;
         this.document.body.classList.remove('light-mode');
       }
+
+      this.userName = localStorage.getItem('userName') || 'Usuario';
+      this.userEmail = localStorage.getItem('userEmail') || 'usuario@app.com';
     }
 
-    // Lógica que ya tenías
-    this.userName = this.auth.userName || 'Usuario';
-    // Animación para la barra de fatiga
-    setTimeout(() => this.fatigaLevel = 100, 400);
+    // Animación barra de “Detectando fatigas”
+    setTimeout(() => (this.fatigaLevel = 100), 400);
   }
 
-  // --- ¡FUNCIONES "PEPA" PARA LOS BOTONES NUEVOS! ---
+  // -------- PERFIL --------
+  toggleProfile() {
+    this.showProfileModal = !this.showProfileModal;
+    if (this.showProfileModal) {
+      this.editData.nombre = this.userName;
+      this.editData.telefono = localStorage.getItem('userPhone') || '';
+      this.editData.email_recuperacion =
+        localStorage.getItem('userRecovery') || '';
+    }
+  }
 
+  saveProfile() {
+    localStorage.setItem('userName', this.editData.nombre);
+    localStorage.setItem('userPhone', this.editData.telefono);
+    localStorage.setItem('userRecovery', this.editData.email_recuperacion);
+    this.userName = this.editData.nombre;
+    this.toggleProfile();
+    alert('¡Datos guardados!');
+  }
+
+  // -------- LENTES / MONITOREO --------
   onStartMonitoring() {
-    console.log('¡BOTÓN INICIAR MONITORÉO PRESIONADO!');
-    // Aquí pondremos la lógica para tu ESP32
-    alert('Iniciando monitoreo... (¡Aquí conectas tu ESP32!)');
+    if (!this.lentesConectados) {
+      alert('Primero conecta tus lentes para iniciar el monitoreo.');
+      return;
+    }
+
+    // Aquí más adelante podrás arrancar lógica real de monitoreo
+    alert('Monitoreo iniciado con los lentes conectados.');
   }
 
   onConnectLenses() {
-    console.log('¡BOTÓN CONECTAR LENTES PRESIONADO!');
-    // Aquí pondremos la lógica de conexión Bluetooth/WiFi
-    alert('Buscando lentes... (¡Aquí conectas tu ESP32!)');
+    this.errorConexionLentes = '';
+    this.conectandoLentes = true;
+
+    const token = typeof window !== 'undefined'
+      ? localStorage.getItem('token')
+      : null;
+
+    if (!token) {
+      this.conectandoLentes = false;
+      this.lentesConectados = false;
+      this.errorConexionLentes = 'Debes iniciar sesión primero.';
+      alert('Debes iniciar sesión primero.');
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    // Ping sencillo al backend para validar token y usuario
+    this.http.get(`${this.backendBase}/users/me`, { headers }).subscribe({
+      next: (res: any) => {
+        console.log('✅ Conexión backend OK, usuario:', res);
+        this.conectandoLentes = false;
+        this.lentesConectados = true;
+        this.errorConexionLentes = '';
+        alert('Lentes vinculados correctamente al usuario (vía backend).');
+      },
+      error: (err) => {
+        console.error('❌ Error conectando lentes:', err);
+        this.conectandoLentes = false;
+        this.lentesConectados = false;
+        this.errorConexionLentes =
+          'No se pudo conectar con el backend. Revisa tu conexión.';
+        alert('No se pudo conectar. Revisa internet o el backend.');
+      },
+    });
   }
 
   onRetry() {
-    console.log('¡BOTÓN REINTENTAR PRESIONADO!');
-    alert('Reintentando conexión...');
+    this.onConnectLenses();
   }
 
-  // --- FUNCIONES QUE YA TENÍAS ---
-
+  // -------- NAVEGACIÓN / SESIÓN --------
   goTo(tab: string) {
     this.selectedTab = tab;
-
-    if (tab === 'history') {
-      this.router.navigate(['/history']);
-    } else if (tab === 'reports') {
-      this.router.navigate(['/reports']);
-    } else if (tab === 'home') {
-      this.router.navigate(['/home']);
-    } else {
-      this.router.navigate([`/${tab}`]);
-    }
+    this.router.navigate([`/${tab}`]);
   }
 
   logout() {
-    this.auth.logout?.(); // Llama a tu servicio si existe ese método
+    this.auth.logout?.();
     localStorage.clear();
     this.router.navigate(['/login']);
   }

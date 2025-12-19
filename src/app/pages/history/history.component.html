@@ -1,24 +1,63 @@
 <div class="history-container">
   <h1 class="history-title">Historial de Alertas</h1>
 
-  <div class="alert-list">
-    <div 
-      class="alert-item glow-border" 
-      *ngFor="let alert of alerts">
-      
+  <!-- 🔵 Estado de los lentes / API -->
+  <div class="lens-status-card">
+    <div *ngIf="lensStatus === 'desconocido'" class="lens-status neutral">
+      Comprobando estado de los lentes...
+    </div>
+
+    <div *ngIf="lensStatus === 'ok'" class="lens-status ok">
+      ✅ Lentes conectados y enviando alertas.
+    </div>
+
+    <div *ngIf="lensStatus === 'sin_alertas'" class="lens-status warn">
+      🟡 Conexión correcta, pero todavía no se han recibido alertas
+      desde los lentes.
+    </div>
+
+    <div *ngIf="lensStatus === 'error'" class="lens-status error">
+      🔴 No se pudo conectar con el servidor de alertas.
+      Revisa la URL del backend o la conexión del ESP32.
+    </div>
+  </div>
+
+  <!-- ESTADOS GENERALES -->
+  <div class="state-text" *ngIf="loading">
+    Cargando alertas...
+  </div>
+
+  <div class="state-text state-error" *ngIf="!loading && error">
+    {{ error }}
+  </div>
+
+  <!-- LISTA VACÍA -->
+  <div
+    class="empty-state"
+    *ngIf="!loading && !error && alerts && alerts.length === 0"
+  >
+    Aún no se han registrado alertas de fatiga.
+  </div>
+
+  <!-- LISTA DE ALERTAS -->
+  <div class="alert-list" *ngIf="!loading && !error && alerts && alerts.length > 0">
+    <div
+      class="alert-item glow-border"
+      *ngFor="let alert of alerts"
+    >
       <div class="alert-indicator"></div>
 
       <div class="alert-content">
         <div class="alert-message">
-          {{ alert.message }}
+          {{ alert.message || alert.mensaje || 'Alerta de fatiga detectada' }}
         </div>
 
         <div class="alert-date-time">
           <span class="alert-date">
-            {{ formatDateTime(alert.created_at || alert.createdAt).fecha }}
+            {{ (alert.created_at || alert.createdAt) | date:'dd/MM/yyyy' }}
           </span>
           <span class="alert-time">
-            {{ formatDateTime(alert.created_at || alert.createdAt).hora }}
+            {{ (alert.created_at || alert.createdAt) | date:'HH:mm' }}
           </span>
         </div>
       </div>
@@ -26,13 +65,20 @@
       <a
         *ngIf="loggedInUserPhone"
         class="whatsapp-link-btn"
-        [href]="'https://wa.me/' + loggedInUserPhone + '?text=' + encode(alert.message)"
-        target="_blank">
+        target="_blank"
+        [href]="
+          'https://wa.me/' +
+          loggedInUserPhone +
+          '?text=' +
+          encode(alert.message || alert.mensaje || '')
+        "
+      >
         Mandar al Número
       </a>
     </div>
   </div>
 
+  <!-- NAVBAR INFERIOR -->
   <nav class="bottom-nav">
     <div class="nav-btn" (click)="goTo('home')">
       <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />

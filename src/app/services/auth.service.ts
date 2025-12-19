@@ -1,13 +1,16 @@
+// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import jwt_decode from 'jwt-decode';
+import { environment } from '../enviromets/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth'; // ← IP quitada, usa localhost
+  // Backend auth
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   userName: string = '';
   currentUser: any = null;
@@ -32,7 +35,13 @@ export class AuthService {
     telefono: string,
     rol: string = 'user'
   ): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, { nombre, email, password, telefono, rol });
+    return this.http.post(`${this.apiUrl}/register`, {
+      nombre,
+      email,
+      password,
+      telefono,
+      rol
+    });
   }
 
   saveToken(token: string) {
@@ -45,8 +54,22 @@ export class AuthService {
   setCurrentUser(token: string) {
     try {
       const decoded: any = jwt_decode(token);
+
       this.userName = decoded.nombre || decoded.email || '';
       this.currentUser = decoded;
+
+      // 👇 Muy importante para History / WhatsApp / Reports
+      if (typeof window !== 'undefined') {
+        if (decoded.id) {
+          localStorage.setItem('userId', decoded.id.toString());
+        }
+        if (decoded.email) {
+          localStorage.setItem('userEmail', decoded.email);
+        }
+        if (decoded.telefono) {
+          localStorage.setItem('userPhone', decoded.telefono.toString());
+        }
+      }
     } catch (e) {
       this.userName = '';
       this.currentUser = null;
@@ -66,7 +89,7 @@ export class AuthService {
       try {
         const decoded: any = jwt_decode(token);
         return decoded.email || '';
-      } catch (e) {
+      } catch {
         return '';
       }
     }
@@ -82,7 +105,7 @@ export class AuthService {
       try {
         const decoded: any = jwt_decode(token);
         return decoded.telefono || '';
-      } catch (e) {
+      } catch {
         return '';
       }
     }
@@ -92,6 +115,9 @@ export class AuthService {
   logout() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userPhone');
     }
     this.userName = '';
     this.currentUser = null;

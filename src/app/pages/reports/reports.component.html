@@ -6,17 +6,19 @@
     <button class="tab" [class.active]="activeTab==='semanal'" (click)="setTab('semanal')">Semanal</button>
     <button class="tab" [class.active]="activeTab==='mensual'" (click)="setTab('mensual')">Mensual</button>
   </div>
+  
   <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
 
-  <!-- GRÁFICAS -->
   <div class="chart-card" *ngIf="activeTab==='diario'">
     <canvas baseChart [type]="'bar'" [data]="barData" [options]="barOptions"></canvas>
     <div class="empty" *ngIf="!loading && (!barData.datasets[0].data || !barData.datasets[0].data.length)">Sin datos en este rango.</div>
   </div>
+
   <div class="chart-card" *ngIf="activeTab==='semanal'">
     <canvas baseChart [type]="'line'" [data]="lineData" [options]="lineOptions"></canvas>
     <div class="empty" *ngIf="!loading && (!lineData.datasets[0].data || !lineData.datasets[0].data.length)">Sin datos en este rango.</div>
   </div>
+
   <div class="chart-card" *ngIf="activeTab==='mensual'">
     <canvas baseChart [type]="'doughnut'" [data]="donutData" [options]="donutOptions"></canvas>
     <div class="empty" *ngIf="!loading && (!donutData.datasets[0].data || !donutData.datasets[0].data.length)">Sin datos en este rango.</div>
@@ -37,24 +39,19 @@
     </div>
   </div>
 
-  <!-- SECCIÓN DE EXPORTACIÓN -->
   <div class="export">
     
-    <!-- 1. Botón Grande: "Enviar a mi correo" -->
     <button class="btn-quick" (click)="exportarCorreoUsuario()" [disabled]="sending">
       <ng-container *ngIf="!sending; else sendingTemplate">
-        <!-- Texto principal solicitado -->
-        <span class="btn-main-text">Enviar a mi correo</span>
-        <!-- Correo pequeño para confirmación visual -->
-        <span class="btn-sub-text">({{ userEmail || '...' }})</span>
+        <span class="btn-label">Enviar reporte a:</span>
+        <span class="btn-user-name">{{ userName || 'Usuario' }}</span>
+        <span class="btn-user-email">{{ userEmail || '...' }}</span>
       </ng-container>
       <ng-template #sendingTemplate>Enviando...</ng-template>
     </button>
 
-    <!-- 2. Separador -->
     <div class="separator-text">o enviar a otro correo:</div>
 
-    <!-- 3. Opción Manual -->
     <div class="manual-group">
       <input type="email" placeholder="otro@correo.com" [(ngModel)]="email">
       <button (click)="exportarCorreoManual()" [disabled]="sending">Enviar</button>
@@ -84,6 +81,7 @@
       <a href="mailto:carojas@sudamericano.edu.ec" class="contact-link">carojas&#64;sudamericano.edu.ec</a>
     </div>
   </div>
+
   <div *ngIf="loading" class="loading">Cargando…</div>
 </div>
 

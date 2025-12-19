@@ -1,186 +1,327 @@
-/* === Home CSS con Variables === */
+/* =========================================
+   1. CONTENEDOR PRINCIPAL
+   ========================================= */
 .home-container {
+  padding: 20px 20px 110px 20px;
   min-height: 100vh;
-  background: var(--color-bg);
-  padding: 1.5rem 1rem 100px 1rem;
-  background-image: 
-    linear-gradient(var(--color-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
-  background-size: 30px 30px;
+  
+  /* Variables para tema oscuro/claro */
+  background-color: var(--color-bg); 
+  
+  /* Patrón de fondo profesional */
+  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-size: 20px 20px;
+  
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+.greeting {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 30px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+/* =========================================
+   2. CABECERA: LOGO GIGANTE Y PERFIL
+   ========================================= */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 35px;
+  padding-top: 10px;
 }
+
+/* --- LOGO GIGANTE (CAMBIO REALIZADO) --- */
 .logo {
-  width: 140px;
-  filter: var(--logo-filter);
+  height: 120px; /* ¡AUMENTADO A 120PX! Se verá enorme */
+  width: auto;
+  object-fit: contain;
+  
+  /* EFECTO DE BRILLO "PEPA" */
+  filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)) 
+          drop-shadow(0 0 15px var(--color-glow-shadow));
+          
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-.logout-btn {
-  background: rgba(0, 175, 255, 0.1);
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
-  font-weight: 700;
+
+.logo:hover {
+  transform: scale(1.05); /* Efecto zoom al pasar el mouse */
+  filter: drop-shadow(0 0 5px rgba(255,255,255,0.8)) 
+          drop-shadow(0 0 25px var(--color-primary));
+}
+
+/* GRUPO DERECHA */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* PERFIL (ESTILO PILL) */
+.profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  padding: 6px 14px 6px 6px;
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
-body.light-mode .logout-btn {
-  background: rgba(0, 122, 255, 0.1);
+
+.profile-pill:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
 }
-.logout-btn:hover {
+
+.avatar-mini {
+  width: 36px; height: 36px;
   background: var(--color-primary);
-  color: var(--color-bg-card);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1rem;
+  box-shadow: 0 2px 8px var(--color-glow);
 }
-.greeting {
-  color: var(--color-text-primary);
-  font-size: 2rem;
-  font-weight: 800;
-  text-align: center;
-  margin: 1rem 0 2rem 0;
-  line-height: 1.2;
+
+.profile-text {
+  display: flex; flex-direction: column;
+  line-height: 1.1;
 }
+.lbl-user { 
+  font-size: 0.9rem; font-weight: 700; 
+  color: var(--color-text-primary); 
+}
+.lbl-edit { 
+  font-size: 0.7rem; color: var(--color-primary); 
+  font-weight: 600; text-transform: uppercase; 
+}
+
+/* BOTÓN SALIR */
+.logout-btn {
+  width: 42px; height: 42px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+.logout-btn img { 
+  width: 18px; 
+  filter: var(--color-nav-icon); 
+  opacity: 0.8; 
+}
+.logout-btn:active { transform: scale(0.9); }
+
+
+/* =========================================
+   3. TARJETAS (CARD DESIGN)
+   ========================================= */
 .status-card {
   background: var(--color-bg-card);
-  border-radius: 20px;
+  border-radius: 24px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 15px 35px -5px rgba(0,0,0,0.08);
   border: 1px solid var(--color-border);
-  padding: 1.5rem;
-  width: 100%;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 8px 32px var(--color-glow);
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
-.glow-border {
-  border: 1px solid var(--color-glow-border);
-  box-shadow: 0 0 20px var(--color-glow-shadow);
+
+.status-card.glow-border {
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 0 25px var(--color-glow);
 }
+
 .status-card h2 {
-  color: var(--color-text-primary);
   font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 0.25rem 0;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
 }
-.status-card .subtitle {
-  color: var(--color-text-secondary);
-  font-size: 1rem;
-  margin: 0 0 1.5rem 0;
+
+.subtitle { 
+  color: var(--color-text-secondary); 
+  font-size: 1rem; margin-bottom: 25px; 
 }
-.status-card .subtitle-small {
-  color: var(--color-text-tertiary);
-  font-size: 0.9rem;
-  margin: 0.5rem 0 0 0;
+.subtitle-small { 
+  color: var(--color-text-tertiary); 
+  font-size: 0.85rem; margin-top: 15px; 
 }
+
+/* Barra de Progreso */
 .progress-bar-container {
   background: var(--color-input-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 20px;
-  height: 2.5rem;
-  padding: 4px;
-  position: relative;
+  border-radius: 50px; height: 40px;
+  position: relative; overflow: hidden;
+  margin-bottom: 25px;
+  border: 1px solid var(--color-input-border);
 }
 .progress-bar-fill {
-  background: linear-gradient(90deg, #00AFFF 0%, #00FF7F 100%);
-  height: 100%;
-  border-radius: 16px;
-  transition: width 0.5s ease;
-  box-shadow: 0 0 15px rgba(0, 255, 127, 0.5);
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  height: 100%; border-radius: 50px; 
+  transition: width 1.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 .progress-label {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-text-primary);
-  font-weight: 700;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-weight: 800; font-size: 1rem; color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 2;
 }
+
+/* Botones Grandes */
 .action-btn {
-  width: 100%;
-  padding: 1rem 0;
-  border-radius: 10px;
-  font-weight: 800;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
+  width: 100%; padding: 16px; border-radius: 16px;
+  font-size: 1.05rem; font-weight: 700; border: none; cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
 }
-.action-btn.primary {
-  background: var(--color-btn-gradient);
-  color: #FFFFFF;
-  box-shadow: 0 4px 15px var(--color-glow-shadow);
+.action-btn:active { transform: scale(0.97); }
+
+.status-card.glow-border .action-btn {
+  background: var(--color-primary); color: white;
+  box-shadow: 0 8px 20px -5px var(--color-glow-shadow);
 }
-.action-btn.primary:hover {
-  box-shadow: 0 6px 30px var(--color-glow-shadow);
-  transform: translateY(-2px);
+
+.button-group { display: flex; gap: 15px; }
+.action-btn.primary { 
+  background: var(--color-primary); color: white; 
 }
-/* ¡ARREGLO PARA BOTONES EN MODO CLARO (image_2ab6ad.png)! */
-.action-btn.secondary {
-  background: var(--color-btn-secondary-bg);
-  border: 1px solid var(--color-btn-secondary-border);
-  color: var(--color-btn-secondary-text);
+.action-btn.secondary { 
+  background: transparent; 
+  border: 2px solid var(--color-border); 
+  color: var(--color-text-secondary); 
 }
-.action-btn.secondary:hover {
-  background: var(--color-btn-secondary-hover-bg);
-  color: var(--color-btn-secondary-hover-text);
+
+
+/* =========================================
+   4. MODAL DE PERFIL (SOLUCIÓN DEFINITIVA)
+   ========================================= */
+.profile-backdrop {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
+  z-index: 2000; animation: fadeIn 0.2s;
 }
-.action-btn:disabled {
-  background: var(--color-btn-disabled);
-  color: var(--color-btn-disabled-text);
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-.button-group {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
+
+.profile-modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 90%; max-width: 400px;
   background: var(--color-bg-card);
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 70px;
-  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
-  z-index: 10;
+  border-radius: 28px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+  z-index: 2001; overflow: hidden;
+  border: 1px solid var(--color-border);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.nav-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  justify-content: center;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.8rem;
-  color: var(--color-text-tertiary);
-  transition: color 0.2s;
-  border: none;
-  background: none;
+
+.profile-header {
+  background: linear-gradient(135deg, var(--color-primary), #00c6ff);
+  padding: 35px 25px; display: flex; align-items: center; gap: 20px;
+  color: white; position: relative;
 }
-.nav-btn .nav-icon {
-  height: 24px;
-  width: 24px;
-  filter: var(--color-nav-icon);
-  transition: filter 0.2s ease;
+.avatar-large {
+  width: 65px; height: 65px; background: rgba(255,255,255,0.25);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; font-weight: 800; border: 3px solid rgba(255,255,255,0.6);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
-.nav-btn:hover {
+.header-info h3 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+.header-info p { margin: 4px 0 0 0; font-size: 0.9rem; opacity: 0.9; }
+
+.close-btn {
+  position: absolute; top: 20px; right: 20px;
+  background: rgba(0,0,0,0.1); border: none; color: white;
+  width: 36px; height: 36px; border-radius: 50%;
+  cursor: pointer; font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.profile-body { padding: 25px; max-height: 55vh; overflow-y: auto; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label {
+  display: block; font-size: 0.85rem; font-weight: 700;
+  color: var(--color-text-secondary); margin-bottom: 8px; text-transform: uppercase;
+}
+.form-group input {
+  width: 100%; padding: 14px 16px; border-radius: 14px;
+  border: 2px solid var(--color-input-border);
+  background: var(--color-input-bg); 
   color: var(--color-text-primary);
+  font-size: 1rem; outline: none; transition: 0.2s; font-weight: 600;
 }
-.nav-btn:hover .nav-icon {
+.form-group input:focus {
+  border-color: var(--color-primary); 
+  background: var(--color-bg-card);
+  box-shadow: 0 0 0 4px var(--color-glow-shadow);
+}
+
+.profile-footer {
+  padding: 20px 25px; background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  display: flex; justify-content: flex-end; gap: 15px;
+}
+.btn-cancel {
+  background: transparent; color: var(--color-text-tertiary);
+  padding: 12px 10px; cursor: pointer; font-weight: 700; border: none;
+}
+.btn-save {
+  background: var(--color-primary); color: white; border: none;
+  padding: 12px 28px; border-radius: 12px; font-weight: 700;
+  cursor: pointer; box-shadow: 0 8px 20px -5px var(--color-glow-shadow);
+}
+
+/* ANIMACIONES */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translate(-50%, -40%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+
+
+/* =========================================
+   5. NAVBAR INFERIOR
+   ========================================= */
+.bottom-nav {
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  width: 100%;
+  background: var(--color-bg-card); /* Se adapta al tema */
+  border-top: 1px solid var(--color-border);
+  display: flex; justify-content: space-around; align-items: center;
+  height: 80px; 
+  box-shadow: 0 -5px 30px rgba(0,0,0,0.08);
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; 
+  align-items: center; justify-content: center;
+  gap: 5px; background: none; border: none;
+  color: var(--color-text-tertiary); 
+  font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; height: 100%;
+}
+
+.nav-icon { 
+  height: 26px; width: 26px; 
+  filter: var(--color-nav-icon); /* Usa variable para cambiar color */
+  transition: all 0.3s ease; 
+}
+
+.nav-btn.active .nav-icon { 
   filter: var(--color-nav-icon-active);
+  transform: translateY(-4px); 
 }
-.nav-btn.active {
+.nav-btn.active span {
   color: var(--color-primary);
-}
-.nav-btn.active .nav-icon {
-  filter: var(--color-nav-icon-active);
 }

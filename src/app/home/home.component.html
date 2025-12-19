@@ -1,18 +1,36 @@
 <div class="home-container">
+  <!-- HEADER -->
   <div class="header">
     <img src="/logo-alertavision.png" class="logo" alt="AlertaVisión" />
-    <button class="logout-btn" (click)="logout()">
-      Cerrar sesión
-    </button>
+
+    <div class="header-actions">
+      <div class="profile-pill" (click)="toggleProfile()">
+        <div class="avatar-mini">{{ userName.charAt(0) | uppercase }}</div>
+        <div class="profile-text">
+          <span class="lbl-user">{{ userName.split(' ')[0] }}</span>
+          <span class="lbl-edit">Editar</span>
+        </div>
+      </div>
+
+      <button class="logout-btn" (click)="logout()">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png"
+          alt="Salir"
+        />
+      </button>
+    </div>
   </div>
 
+  <!-- SALUDO -->
   <h1 class="greeting">
-    ¡Hola {{ userName }}! <br> vamos a conduicr juntos
+    ¡Hola {{ userName }}! <br />
+    vamos a conducir juntos
   </h1>
 
+  <!-- TARJETA DETECTANDO FATIGAS -->
   <div class="status-card glow-border">
     <h2>Detectando fatigas</h2>
-    <p class="subtitle">Mantén la concentratión</p>
+    <p class="subtitle">Mantén la concentración</p>
 
     <div class="progress-bar-container">
       <div class="progress-bar-fill" [style.width.%]="fatigaLevel"></div>
@@ -20,37 +38,114 @@
     </div>
 
     <button class="action-btn" (click)="onStartMonitoring()">
-      Iniciar monitoréo
+      Iniciar monitoreo
     </button>
     <p class="subtitle-small">Conecta tus lentes para iniciar</p>
   </div>
 
+  <!-- TARJETA ESTADO DE LOS LENTES -->
   <div class="status-card">
-    <h2>No se detectan los lentes</h2>
-    <p class="subtitle">
+    <h2 *ngIf="!lentesConectados">No se detectan los lentes</h2>
+    <h2 *ngIf="lentesConectados">✅ Lentes conectados</h2>
+
+    <p class="subtitle" *ngIf="!lentesConectados">
       Enciende tus lentes y acércalos para vincular.
+    </p>
+    <p class="subtitle" *ngIf="lentesConectados">
+      Tus lentes están vinculados a este usuario. Puedes iniciar el monitoreo.
     </p>
 
     <div class="button-group">
-      <button class="action-btn secondary" (click)="onRetry()">Reitentar</button>
-      <button class="action-btn primary" (click)="onConnectLenses()">Conectar</button>
+      <button
+        class="action-btn secondary"
+        (click)="onRetry()"
+        [disabled]="conectandoLentes"
+      >
+        {{ conectandoLentes ? 'Conectando...' : 'Reintentar' }}
+      </button>
+
+      <button
+        class="action-btn primary"
+        (click)="onConnectLenses()"
+        [disabled]="conectandoLentes"
+      >
+        {{
+          conectandoLentes
+            ? 'Conectando...'
+            : (lentesConectados ? 'Reconectar' : 'Conectar')
+        }}
+      </button>
     </div>
+
+    <p class="error-text" *ngIf="errorConexionLentes">
+      {{ errorConexionLentes }}
+    </p>
   </div>
 </div>
 
+<!-- NAV INFERIOR -->
 <nav class="bottom-nav">
   <div class="nav-btn active" (click)="goTo('home')">
-    <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />
-    <span>Inicio</span>
+    <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" /><span
+      >Inicio</span
+    >
   </div>
-
   <div class="nav-btn" (click)="goTo('history')">
-    <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
-    <span>Alertas</span>
+    <img
+      src="/icon-park--history-query.svg"
+      alt="Alertas"
+      class="nav-icon"
+    /><span>Alertas</span>
   </div>
-
   <div class="nav-btn" (click)="goTo('reports')">
-    <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
-    <span>Reportes</span>
+    <img
+      src="/iconoir--reports-solid.svg"
+      alt="Reportes"
+      class="nav-icon"
+    /><span>Reportes</span>
   </div>
 </nav>
+
+<!-- MODAL PERFIL -->
+<div class="profile-backdrop" *ngIf="showProfileModal" (click)="toggleProfile()"></div>
+
+<div class="profile-modal" *ngIf="showProfileModal">
+  <div class="profile-header">
+    <div class="avatar-large">{{ userName.charAt(0) | uppercase }}</div>
+    <div class="header-info">
+      <h3>{{ userName }}</h3>
+      <p>{{ userEmail }}</p>
+    </div>
+    <button class="close-btn" (click)="toggleProfile()">✕</button>
+  </div>
+
+  <div class="profile-body">
+    <div class="form-group">
+      <label>Nombre de Usuario</label>
+      <input type="text" [(ngModel)]="editData.nombre" placeholder="Tu nombre" />
+    </div>
+
+    <div class="form-group">
+      <label>Teléfono</label>
+      <input
+        type="text"
+        [(ngModel)]="editData.telefono"
+        placeholder="Ej: 099..."
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Correo de Recuperación</label>
+      <input
+        type="email"
+        [(ngModel)]="editData.email_recuperacion"
+        placeholder="respaldo@gmail.com"
+      />
+    </div>
+  </div>
+
+  <div class="profile-footer">
+    <button class="btn-cancel" (click)="toggleProfile()">Cancelar</button>
+    <button class="btn-save" (click)="saveProfile()">Guardar Cambios</button>
+  </div>
+</div>
