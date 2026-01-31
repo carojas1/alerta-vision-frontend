@@ -8,9 +8,8 @@ import { throwError } from 'rxjs';
  * Auth Interceptor for Angular Standalone
  * 
  * Este interceptor:
- * 1. Adjunta el JWT token a todas las peticiones HTTP (excepto assets y endpoints de auth)
- * 2. Maneja errores 401/403 redirigiendo al usuario al login
- * 3. Funciona correctamente en desarrollo y producción
+ * 1. Adjunta el JWT token a todas las peticiones HTTP
+ * 2. NO redirige automáticamente al login (eso lo manejan los componentes)
  */
 
 // Helper: Detecta si la URL es un asset estático
@@ -31,20 +30,41 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
 
+  // Log para debug
+  if (!skipAttach) {
+    console.log('🔐 Request:', req.method, req.url);
+    console.log('🔑 Token existe:', !!token);
+  }
+
   return next(request).pipe(
     catchError((err: unknown) => {
       if (err instanceof HttpErrorResponse) {
-        // Si es error de autenticación o autorización, limpiar token y redirigir
-        if (err.status === 401 || err.status === 403) {
+        console.log('❌ Error HTTP:', err.status, err.url);
+        
+        // Solo redirigir al login si:
+        // 1. Es error 401 (no autorizado)
+        // 2. NO estamos en la página de login
+        // 3. Es una petición a la API (no assets)
+        if (err.status === 401 && !router.url.startsWith('/login') && !isAsset(err.url || '')) {
+          console.log('🔄 Token expirado o inválido, redirigiendo a login...');
+          
+          // Limpiar datos de sesión
           localStorage.removeItem('token');
           localStorage.removeItem('userId');
           localStorage.removeItem('userEmail');
           localStorage.removeItem('userPhone');
+          localStorage.removeItem('nombre');
+          localStorage.removeItem('email');
+          localStorage.removeItem('role');
+          localStorage.removeItem('telefono');
 
-          // Redirigir a login solo si no estamos ya ahí
-          if (!router.url.startsWith('/login')) {
-            router.navigateByUrl('/login');
-          }
+          // Redirigir a login
+          router.navigateByUrl('/login');
+        }
+        
+        // Para error 403 (forbidden) solo mostrar mensaje, no redirigir
+        if (err.status === 403) {
+          console.log('⛔ Acceso denegado (403)');
         }
       }
       return throwError(() => err);

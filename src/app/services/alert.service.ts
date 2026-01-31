@@ -1,35 +1,66 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../enviromets/environment';
 
-// Modelo que se adapta a lo que venga del backend
+// Modelo de alerta que viene del backend
 export interface Alerta {
   id: number;
-  mensaje?: string;    // algunos backends usan "mensaje"
-  message?: string;    // otros usan "message"
-  nivel?: string;
+  usuarioId?: number;
+  tipoAlerta?: string;
+  mensaje?: string;
+  nivelFatiga?: number;
+  fecha?: string;
+  // Compatibilidad con diferentes formatos
+  message?: string;
   tipo?: string;
-  createdAt?: string;  // camelCase
-  created_at?: string; // snake_case
+  nivel?: string;
+  createdAt?: string;
+  created_at?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlertService {
-  // https://alerta-vision-backend.onrender.com/alerts
+  // ✅ Endpoint correcto: /alerts (plural, protegido por JWT)
   private apiUrl = `${environment.apiUrl}/alerts`;
 
-  constructor(private http: HttpClient) {}
-
-  // Todas las alertas (si tu backend lo permite)
-  getAlerts(): Observable<Alerta[]> {
-    return this.http.get<Alerta[]>(this.apiUrl);
+  constructor(private http: HttpClient) {
+    console.log('🔧 AlertService inicializado');
+    console.log('🌐 API URL:', this.apiUrl);
+    console.log('🔑 Token en localStorage:', !!localStorage.getItem('token'));
   }
 
-  // Alertas de un usuario
-  getAlertsByUser(userId: number | string): Observable<Alerta[]> {
-    return this.http.get<Alerta[]>(`${this.apiUrl}/${userId}`);
+  /**
+   * ✅ MÉTODO PRINCIPAL: Obtiene las alertas del usuario logueado
+   * El backend toma el userId del JWT token automáticamente
+   * NO necesita pasar userId en la URL
+   */
+  getMyAlerts(): Observable<Alerta[]> {
+    console.log('🌐 Consultando alertas (JWT):', this.apiUrl);
+    return this.http.get<Alerta[]>(this.apiUrl).pipe(
+      tap(data => console.log('✅ Alertas recibidas del backend:', data))
+    );
+  }
+
+  /**
+   * Alias para compatibilidad (por si algún componente aún usa getAlertsByUser)
+   * @deprecated Usar getMyAlerts() en su lugar
+   */
+  getAlertsByUser(userId?: number | string): Observable<Alerta[]> {
+    console.log('⚠️ getAlertsByUser está deprecado, usando getMyAlerts()');
+    return this.getMyAlerts();
+  }
+
+  /**
+   * Obtiene todas las alertas (solo para admin)
+   */
+  getAllAlerts(): Observable<Alerta[]> {
+    console.log('🌐 Consultando todas las alertas:', this.apiUrl);
+    return this.http.get<Alerta[]>(this.apiUrl).pipe(
+      tap(data => console.log('✅ Todas las alertas recibidas:', data))
+    );
   }
 }

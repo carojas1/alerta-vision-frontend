@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://alerta-vision-backend.onrender.com'
+  apiUrl: 'http://localhost:10000'
 };

@@ -5,9 +5,15 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:auth-frontend": "node dist/auth-frontend/server/server.mjs"
+    "serve:ssr:auth-frontend": "node dist/auth-frontend/server/server.mjs",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android",
+    "cap:build": "npm run build:prod && npx cap sync android",
+    "apk:debug": "npm run cap:build && cd android && gradlew assembleDebug",
+    "apk:release": "npm run cap:build && cd android && gradlew assembleRelease"
   },
   "private": true,
   "dependencies": {
@@ -25,6 +31,7 @@
     "@capacitor/android": "^7.4.4",
     "@capacitor/cli": "^7.4.4",
     "@capacitor/core": "^7.4.4",
+    "@capacitor/local-notifications": "^8.0.0",
     "chart.js": "^4.5.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",

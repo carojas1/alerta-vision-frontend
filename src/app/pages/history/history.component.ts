@@ -14,13 +14,14 @@ type LensStatus = 'desconocido' | 'ok' | 'sin_alertas' | 'error';
 })
 export class HistoryComponent implements OnInit {
 
+  // ✅ Variable única: alertas (igual en TS y HTML)
   alertas: Alerta[] = [];
   loading = false;
   error?: string;
 
   loggedInUserPhone: string | null = null;
 
-  // 🔵 Estado de los lentes / API
+  // Estado de los lentes / API
   lensStatus: LensStatus = 'desconocido';
 
   constructor(
@@ -29,39 +30,31 @@ export class HistoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userIdStr =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('userId')
-        : null;
-
+    // Obtener teléfono para WhatsApp (no necesario para la consulta)
     this.loggedInUserPhone =
       typeof window !== 'undefined'
         ? localStorage.getItem('userPhone')
         : null;
 
-    if (!userIdStr) {
-      this.error = 'No se encontró el usuario. Vuelve a iniciar sesión.';
-      this.lensStatus = 'error';
-      return;
-    }
-
-    const userId = Number(userIdStr);
-    this.cargarAlertas(userId);
+    // ✅ Cargar alertas sin necesidad de userId (el JWT tiene la info)
+    this.cargarAlertas();
   }
 
-  get alerts(): Alerta[] {
-    return this.alertas;
-  }
-
-  cargarAlertas(userId: number): void {
+  /**
+   * ✅ Carga alertas usando getMyAlerts() - sin userId en URL
+   * El backend identifica al usuario por el JWT token
+   */
+  cargarAlertas(): void {
     this.loading = true;
     this.error = undefined;
     this.lensStatus = 'desconocido';
 
-    this.alertService.getAlertsByUser(userId).subscribe({
+    // ✅ Llamar al método correcto sin pasar userId
+    this.alertService.getMyAlerts().subscribe({
       next: (data: Alerta[]) => {
-        console.log('📥 ALERTAS DESDE API:', data); // 👈 revisa en consola
+        console.log('📥 ALERTAS RECIBIDAS:', data);
 
+        // Ordenar por fecha (más recientes primero)
         this.alertas = (data || []).sort((a, b) => {
           const da = this.getDate(a);
           const db = this.getDate(b);
@@ -70,30 +63,48 @@ export class HistoryComponent implements OnInit {
 
         if (this.alertas.length > 0) {
           this.lensStatus = 'ok';
+          console.log('✅ Alertas cargadas:', this.alertas.length);
         } else {
           this.lensStatus = 'sin_alertas';
+          console.log('📭 No hay alertas para este usuario');
         }
 
         this.loading = false;
       },
       error: (err: unknown) => {
-        console.error('❌ Error cargando alertas', err);
-        this.error = 'No se pudo conectar con el servidor de alertas.';
+        console.error('❌ Error cargando alertas:', err);
+        this.error = 'No se pudo conectar con el servidor. Verifica tu conexión.';
         this.lensStatus = 'error';
         this.loading = false;
       }
     });
   }
 
+  /**
+   * Extrae la fecha de una alerta (soporta múltiples formatos)
+   */
   private getDate(alert: Alerta): Date {
-    const raw = alert.createdAt || alert.created_at || '';
+    const raw = alert.fecha || alert.createdAt || alert.created_at || '';
     return raw ? new Date(raw) : new Date(0);
   }
 
+  /**
+   * Codifica texto para URL (WhatsApp)
+   */
   encode(text?: string): string {
     return encodeURIComponent(text || '');
   }
 
+  /**
+   * Obtiene el mensaje de una alerta (soporta múltiples formatos)
+   */
+  getMensaje(alert: Alerta): string {
+    return alert.mensaje || alert.message || 'Alerta de fatiga detectada';
+  }
+
+  /**
+   * Navegación
+   */
   goTo(path: string): void {
     this.router.navigate(['/' + path]);
   }
