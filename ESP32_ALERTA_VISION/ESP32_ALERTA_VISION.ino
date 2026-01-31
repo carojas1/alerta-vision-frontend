@@ -14,9 +14,9 @@ const char* WIFI_SSID     = "ANDRES 4607";
 const char* WIFI_PASSWORD = "12345678";
 
 // ==========================================
-// 🌐 SERVIDOR BACKEND (endpoint /alert singular)
+// 🌐 SERVIDOR BACKEND (endpoint /alerts/esp32 público)
 // ==========================================
-const char* BACKEND_URL = "https://alerta-vision-backend.onrender.com/alert";
+const char* BACKEND_URL = "https://alerta-vision-backend.onrender.com/alerts/esp32";
 const int USUARIO_ID = 1;
 
 // ==========================================
