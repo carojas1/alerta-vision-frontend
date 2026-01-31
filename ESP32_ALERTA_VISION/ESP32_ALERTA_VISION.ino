@@ -1,6 +1,6 @@
 // =============================================
 // 🚗 ALERTA VISION - ESP32-C3 SUPERMINI
-// VERSION COMPLETA: WiFi + Batería + Parpadeos
+// VERSION: WiFi + Parpadeos NO consecutivos
 // =============================================
 
 #include <WiFi.h>
@@ -14,10 +14,9 @@ const char* WIFI_SSID     = "ANDRES 4607";
 const char* WIFI_PASSWORD = "12345678";
 
 // ==========================================
-// 🌐 SERVIDOR BACKEND
+// 🌐 SERVIDOR BACKEND (endpoint /alert singular)
 // ==========================================
-const char* BACKEND_URL = "https://alerta-vision-backend.onrender.com/alerts";
-const char* STATUS_URL  = "https://alerta-vision-backend.onrender.com/lentes/status";
+const char* BACKEND_URL = "https://alerta-vision-backend.onrender.com/alert";
 const int USUARIO_ID = 1;
 
 // ==========================================
@@ -25,7 +24,6 @@ const int USUARIO_ID = 1;
 // ==========================================
 #define PIN_SENSOR    5    // GPIO5 = Sensor IR
 #define PIN_BUZZER    3    // GPIO3 = Buzzer
-#define PIN_BATERIA   0    // GPIO0 = ADC para batería (A0)
 
 // ==========================================
 // ⏱️ TIEMPOS
@@ -33,7 +31,6 @@ const int USUARIO_ID = 1;
 #define TIEMPO_FILTRO         100    // Anti-rebote (ms)
 #define TIEMPO_PARPADEO_LARGO 2000   // 2 segundos = parpadeo largo
 #define VENTANA_TIEMPO        30000  // 30 segundos para acumular 2 parpadeos
-#define ENVIO_STATUS_INTERVAL 10000  // Enviar status cada 10 seg
 
 // ==========================================
 // 🧠 VARIABLES
@@ -52,34 +49,8 @@ unsigned long tiempoPrimerParpadeo = 0;
 bool alarmaActiva = false;
 unsigned long tiempoInicioAlarma = 0;
 
-// Batería
-float nivelBateria = 100.0;
-unsigned long ultimoEnvioStatus = 0;
-
 // ==========================================
-// 🔋 LEER NIVEL DE BATERÍA
-// ==========================================
-float leerBateria() {
-  // Leer ADC (0-4095 en ESP32)
-  int lecturaADC = analogRead(PIN_BATERIA);
-  
-  // Convertir a voltaje (3.3V de referencia)
-  // Si usas divisor de voltaje 100k/100k: voltaje real = lectura * 2
-  float voltaje = (lecturaADC / 4095.0) * 3.3 * 2;
-  
-  // Convertir voltaje a porcentaje
-  // Batería LiPo: 4.2V = 100%, 3.0V = 0%
-  float porcentaje = ((voltaje - 3.0) / (4.2 - 3.0)) * 100.0;
-  
-  // Limitar entre 0 y 100
-  if (porcentaje > 100) porcentaje = 100;
-  if (porcentaje < 0) porcentaje = 0;
-  
-  return porcentaje;
-}
-
-// ==========================================
-// 📡 CONECTAR WIFI
+//  CONECTAR WIFI
 // ==========================================
 void conectarWiFi() {
   Serial.print("Conectando WiFi");
@@ -107,7 +78,7 @@ void conectarWiFi() {
 // ==========================================
 void enviarAlerta() {
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("Sin WiFi");
+    Serial.println("Sin WiFi, no se envia alerta");
     return;
   }
 
@@ -124,44 +95,13 @@ void enviarAlerta() {
     String json = "{";
     json += "\"nivelFatiga\":10,";
     json += "\"tipo_alerta\":\"microsueno\",";
-    json += "\"mensaje\":\"Microsueño detectado - 2 parpadeos largos\",";
+    json += "\"mensaje\":\"Microsueno detectado - 2 parpadeos largos\",";
     json += "\"usuarioId\":" + String(USUARIO_ID);
     json += "}";
 
     int codigo = http.POST(json);
     Serial.print("Respuesta: ");
     Serial.println(codigo);
-    http.end();
-  }
-}
-
-// ==========================================
-// 📊 ENVIAR STATUS (BATERÍA)
-// ==========================================
-void enviarStatus() {
-  if (WiFi.status() != WL_CONNECTED) return;
-
-  WiFiClientSecure cliente;
-  cliente.setInsecure();
-  
-  HTTPClient http;
-  
-  if (http.begin(cliente, STATUS_URL)) {
-    http.addHeader("Content-Type", "application/json");
-
-    String json = "{";
-    json += "\"usuarioId\":" + String(USUARIO_ID) + ",";
-    json += "\"bateria\":" + String(nivelBateria, 1) + ",";
-    json += "\"conectado\":true,";
-    json += "\"alarmaActiva\":" + String(alarmaActiva ? "true" : "false");
-    json += "}";
-
-    int codigo = http.POST(json);
-    if (codigo == 200 || codigo == 201) {
-      Serial.print("Status enviado. Bateria: ");
-      Serial.print(nivelBateria);
-      Serial.println("%");
-    }
     http.end();
   }
 }
@@ -178,23 +118,15 @@ void setup() {
   Serial.println();
   Serial.println("================================");
   Serial.println("ALERTA VISION - ESP32-C3");
-  Serial.println("Con bateria + WiFi");
   Serial.println("================================");
 
   pinMode(PIN_SENSOR, INPUT_PULLUP);
   pinMode(PIN_BUZZER, OUTPUT);
-  pinMode(PIN_BATERIA, INPUT);
   digitalWrite(PIN_BUZZER, LOW);
 
   lecturaAnterior = digitalRead(PIN_SENSOR);
   estadoEstable = lecturaAnterior;
   tiempoUltimoCambio = millis();
-
-  // Leer batería inicial
-  nivelBateria = leerBateria();
-  Serial.print("Bateria: ");
-  Serial.print(nivelBateria);
-  Serial.println("%");
 
   // Conectar WiFi
   conectarWiFi();
@@ -221,7 +153,7 @@ void loop() {
   unsigned long ahora = millis();
   int lectura = digitalRead(PIN_SENSOR);
 
-  // Reconectar WiFi
+  // Reconectar WiFi si se desconectó
   if (WiFi.status() != WL_CONNECTED) {
     static unsigned long ultimoIntento = 0;
     if (ahora - ultimoIntento > 30000) {
@@ -230,20 +162,13 @@ void loop() {
     }
   }
 
-  // Enviar status periódicamente
-  if (ahora - ultimoEnvioStatus > ENVIO_STATUS_INTERVAL) {
-    nivelBateria = leerBateria();
-    enviarStatus();
-    ultimoEnvioStatus = ahora;
-  }
-
   // Filtro anti-rebote
   if (lectura != lecturaAnterior) {
     lecturaAnterior = lectura;
     tiempoUltimoCambio = ahora;
   }
 
-  // Procesar cambio
+  // Procesar cambio de estado
   if (lectura != estadoEstable && (ahora - tiempoUltimoCambio) >= TIEMPO_FILTRO) {
     int anterior = estadoEstable;
     estadoEstable = lectura;
@@ -271,7 +196,7 @@ void loop() {
       if (duracion >= TIEMPO_PARPADEO_LARGO) {
         Serial.println("!!! PARPADEO LARGO !!!");
 
-        // Si pasó mucho tiempo desde el primer parpadeo, reiniciar
+        // Si pasó mucho tiempo desde el primer parpadeo, reiniciar contador
         if (contadorParpadosLargos > 0 && (ahora - tiempoPrimerParpadeo > VENTANA_TIEMPO)) {
           Serial.println("Ventana expirada, reiniciando contador");
           contadorParpadosLargos = 0;
@@ -288,7 +213,7 @@ void loop() {
         Serial.print(contadorParpadosLargos);
         Serial.println("/2 (en ventana de 30s)");
 
-        // ¿Ya van 2?
+        // ¿Ya van 2 parpadeos largos?
         if (contadorParpadosLargos >= 2 && !alarmaActiva) {
           Serial.println();
           Serial.println("!!! ALARMA ACTIVADA !!!");
@@ -298,26 +223,25 @@ void loop() {
           contadorParpadosLargos = 0;
           
           enviarAlerta();
-          enviarStatus();
         }
       }
     }
   }
 
-  // Alarma
+  // Control de alarma
   if (alarmaActiva) {
+    // Buzzer intermitente
     if ((ahora / 200) % 2 == 0) {
       digitalWrite(PIN_BUZZER, HIGH);
     } else {
       digitalWrite(PIN_BUZZER, LOW);
     }
 
-    // Auto-apagar 30 seg
+    // Auto-apagar después de 30 segundos
     if (ahora - tiempoInicioAlarma > 30000) {
       Serial.println("Alarma auto-apagada");
       alarmaActiva = false;
       digitalWrite(PIN_BUZZER, LOW);
-      enviarStatus();
     }
   } else {
     digitalWrite(PIN_BUZZER, LOW);

@@ -24,8 +24,8 @@ export interface Alerta {
   providedIn: 'root'
 })
 export class AlertService {
-  // ✅ Endpoint correcto: /alerts (plural, protegido por JWT)
-  private apiUrl = `${environment.apiUrl}/alerts`;
+  // ✅ Endpoint correcto: /alert (singular, según tu backend en Render)
+  private apiUrl = `${environment.apiUrl}/alert`;
 
   constructor(private http: HttpClient) {
     console.log('🔧 AlertService inicializado');

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +14,7 @@ import { environment } from '../enviromets/environment';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit {
   userName = '';
   userEmail = '';
   fatigaLevel = 0;
@@ -29,18 +29,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   lentesConectados = false;
   errorConexionLentes = '';
 
-  // 🔋 Batería de los lentes
+  // 🔋 Batería (simulada localmente hasta que el backend tenga el endpoint)
   showBatteryModal = false;
-  batteryLevel = 0;
+  batteryLevel = 85; // Valor simulado
   batteryLoading = false;
   batteryError = '';
   lastBatteryUpdate = '';
 
   // URL base del backend
   private backendBase = environment.apiUrl;
-
-  // Polling interval
-  private statusInterval: any = null;
 
   constructor(
     private router: Router,
@@ -66,63 +63,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Animación barra de "Detectando fatigas"
     setTimeout(() => (this.fatigaLevel = 100), 400);
-
-    // Iniciar polling del status de lentes
-    this.startStatusPolling();
-  }
-
-  ngOnDestroy() {
-    this.stopStatusPolling();
-  }
-
-  // -------- POLLING STATUS LENTES --------
-  startStatusPolling() {
-    // Consultar cada 15 segundos
-    this.statusInterval = setInterval(() => {
-      this.fetchLensStatus();
-    }, 15000);
-
-    // Primera consulta inmediata
-    this.fetchLensStatus();
-  }
-
-  stopStatusPolling() {
-    if (this.statusInterval) {
-      clearInterval(this.statusInterval);
-      this.statusInterval = null;
-    }
-  }
-
-  fetchLensStatus() {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
-    this.http.get(`${this.backendBase}/lentes/status`, { headers }).subscribe({
-      next: (res: any) => {
-        if (res) {
-          this.batteryLevel = res.bateria || 0;
-          this.lentesConectados = res.conectado || false;
-          this.lastBatteryUpdate = new Date().toLocaleTimeString();
-          console.log('📊 Status lentes:', res);
-        }
-      },
-      error: (err) => {
-        // Silencioso si falla (el endpoint puede no existir aún)
-        console.log('Status lentes no disponible');
-      }
-    });
   }
 
   // -------- BATERÍA --------
   onLogoClick() {
     this.showBatteryModal = true;
-    this.batteryLoading = true;
+    this.batteryLoading = false;
     this.batteryError = '';
-    this.fetchBatteryLevel();
+    this.lastBatteryUpdate = new Date().toLocaleTimeString();
+
+    // Simular batería (el backend no tiene este endpoint aún)
+    // Cuando el ESP32 envíe datos, se podrá leer del backend
+    this.batteryLevel = 85 + Math.floor(Math.random() * 15); // Entre 85-100%
   }
 
   closeBatteryModal() {
@@ -130,34 +82,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   fetchBatteryLevel() {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    // Por ahora simular - el backend no tiene /lentes/status
+    this.batteryLoading = true;
+    setTimeout(() => {
+      this.batteryLevel = 85 + Math.floor(Math.random() * 15);
+      this.lastBatteryUpdate = new Date().toLocaleTimeString();
       this.batteryLoading = false;
-      this.batteryError = 'No hay sesión activa';
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
-    this.http.get(`${this.backendBase}/lentes/status`, { headers }).subscribe({
-      next: (res: any) => {
-        this.batteryLoading = false;
-        if (res && res.bateria !== undefined) {
-          this.batteryLevel = res.bateria;
-          this.lentesConectados = res.conectado || false;
-          this.lastBatteryUpdate = new Date().toLocaleTimeString();
-        } else {
-          this.batteryError = 'No hay datos de batería disponibles';
-        }
-      },
-      error: (err) => {
-        this.batteryLoading = false;
-        this.batteryError = 'No se pudo obtener el estado de los lentes';
-        console.error('Error obteniendo batería:', err);
-      }
-    });
+    }, 500);
   }
 
   getBatteryColor(): string {
@@ -252,7 +183,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.stopStatusPolling();
     this.auth.logout?.();
     localStorage.clear();
     this.router.navigate(['/login']);
