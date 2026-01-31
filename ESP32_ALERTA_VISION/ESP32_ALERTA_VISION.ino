@@ -1,240 +1,327 @@
+// =============================================
+// 🚗 ALERTA VISION - ESP32-C3 SUPERMINI
+// VERSION COMPLETA: WiFi + Batería + Parpadeos
+// =============================================
+
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
 
 // ==========================================
-// 📶 CONFIGURACIÓN WIFI Y SERVIDOR
+// 📶 CONFIGURACIÓN WIFI
 // ==========================================
-const char* ssid = "ANDRES 4607";          // ⬅️ CAMBIAR ESTO
-const char* password = "12345678";    // ⬅️ CAMBIAR ESTO
-
-// URL del Backend (Render)
-// Nota: Si usas localhost, usa tu IP local (ej: http://192.168.1.15:10000/alerts)
-const char* serverUrl = "https://alerta-vision-backend.onrender.com/alerts";
-
-// Token falso si tu backend no exige Auth para el ESP32, 
-// o el token real si implementas auth en el dispositivo. 
-// Por ahora asumimos que el endpoint /alerts acepta requests sin token o lo manejas tú.
-// Si necesitas token: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+const char* WIFI_SSID     = "ANDRES 4607";
+const char* WIFI_PASSWORD = "12345678";
 
 // ==========================================
-// ⚙️ PINES Y CONFIGURACIÓN HARDWARE
+// 🌐 SERVIDOR BACKEND
 // ==========================================
-#define IR_PIN      5    // Sensor infrarrojo (Ojo)
-#define BUZZER_PIN  3    // Transistor -> buzzer
+const char* BACKEND_URL = "https://alerta-vision-backend.onrender.com/alerts";
+const char* STATUS_URL  = "https://alerta-vision-backend.onrender.com/lentes/status";
+const int USUARIO_ID = 1;
 
-// true  => LOW = ojo cerrado (común en sensores IR activos bajo)
-// false => HIGH = ojo cerrado
-const bool CLOSED_IS_LOW = true;
+// ==========================================
+// ⚙️ PINES
+// ==========================================
+#define PIN_SENSOR    5    // GPIO5 = Sensor IR
+#define PIN_BUZZER    3    // GPIO3 = Buzzer
+#define PIN_BATERIA   0    // GPIO0 = ADC para batería (A0)
 
-// TIEMPOS
-const unsigned long STABLE_MS       = 80;     // Filtro anti-ruido (ms)
-const unsigned long CLOSED_LONG_MS  = 2000;   // 2 segundos cerrado = MICROSUEÑO
+// ==========================================
+// ⏱️ TIEMPOS
+// ==========================================
+#define TIEMPO_FILTRO         100    // Anti-rebote (ms)
+#define TIEMPO_PARPADEO_LARGO 2000   // 2 segundos = parpadeo largo
+#define VENTANA_TIEMPO        30000  // 30 segundos para acumular 2 parpadeos
+#define ENVIO_STATUS_INTERVAL 10000  // Enviar status cada 10 seg
 
-// ESTADO INTERNO
-int lastRaw = HIGH;
-int stableState = HIGH;
-unsigned long lastChangeMs = 0;
+// ==========================================
+// 🧠 VARIABLES
+// ==========================================
+int lecturaAnterior = HIGH;
+int estadoEstable = HIGH;
+unsigned long tiempoUltimoCambio = 0;
 
 bool ojoCerrado = false;
-unsigned long closedStartMs = 0;
+unsigned long tiempoInicioCierre = 0;
 
-// Evitar enviar alertas repetidas muy seguido
-unsigned long lastAlertSentMs = 0;
-const unsigned long ALERT_COOLDOWN_MS = 5000; // Esperar 5s entre envíos al servidor
+// Contador de parpadeos (NO tienen que ser seguidos)
+int contadorParpadosLargos = 0;
+unsigned long tiempoPrimerParpadeo = 0;
+
+bool alarmaActiva = false;
+unsigned long tiempoInicioAlarma = 0;
+
+// Batería
+float nivelBateria = 100.0;
+unsigned long ultimoEnvioStatus = 0;
 
 // ==========================================
-// 🛠️ FUNCIONES AUXILIARES
+// 🔋 LEER NIVEL DE BATERÍA
 // ==========================================
-
-// Determina si el ojo está cerrado según la configuración
-inline bool isClosed(int level) {
-  return CLOSED_IS_LOW ? (level == LOW) : (level == HIGH);
+float leerBateria() {
+  // Leer ADC (0-4095 en ESP32)
+  int lecturaADC = analogRead(PIN_BATERIA);
+  
+  // Convertir a voltaje (3.3V de referencia)
+  // Si usas divisor de voltaje 100k/100k: voltaje real = lectura * 2
+  float voltaje = (lecturaADC / 4095.0) * 3.3 * 2;
+  
+  // Convertir voltaje a porcentaje
+  // Batería LiPo: 4.2V = 100%, 3.0V = 0%
+  float porcentaje = ((voltaje - 3.0) / (4.2 - 3.0)) * 100.0;
+  
+  // Limitar entre 0 y 100
+  if (porcentaje > 100) porcentaje = 100;
+  if (porcentaje < 0) porcentaje = 0;
+  
+  return porcentaje;
 }
 
-// Conectar al WiFi
-void connectToWiFi() {
-  Serial.print("📡 Conectando a WiFi");
+// ==========================================
+// 📡 CONECTAR WIFI
+// ==========================================
+void conectarWiFi() {
+  Serial.print("Conectando WiFi");
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   int intentos = 0;
   while (WiFi.status() != WL_CONNECTED && intentos < 20) {
     delay(500);
     Serial.print(".");
-    digitalWrite(BUZZER_PIN, !digitalRead(BUZZER_PIN)); // Pequeño bip visual/sonoro
-    delay(50);
-    digitalWrite(BUZZER_PIN, LOW);
     intentos++;
   }
 
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\n✅ WiFi Conectado!");
-    Serial.print("📍 IP Address: ");
+    Serial.println(" OK!");
+    Serial.print("IP: ");
     Serial.println(WiFi.localIP());
   } else {
-    Serial.println("\n❌ Falló la conexión WiFi. Trabajando en modo Offline.");
+    Serial.println(" FALLO");
   }
 }
 
-// Enviar Alerta al Backend
-void sendFatigueAlert(int nivel, String tipo, String mensaje) {
+// ==========================================
+// 🚀 ENVIAR ALERTA AL SERVIDOR
+// ==========================================
+void enviarAlerta() {
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("⚠️ No hay WiFi. No se puede enviar alerta.");
+    Serial.println("Sin WiFi");
     return;
   }
 
-  // Prevenir spam de alertas
-  if (millis() - lastAlertSentMs < ALERT_COOLDOWN_MS) {
-    return; 
-  }
-
-  WiFiClientSecure client;
-  client.setInsecure(); // ⚠️ Importante para HTTPS sin certificado raíz (desarrollo/tests)
+  WiFiClientSecure cliente;
+  cliente.setInsecure();
   
   HTTPClient http;
   
-  Serial.println("🚀 Enviando alerta al servidor...");
+  Serial.println("Enviando alerta...");
   
-  // Iniciar conexión
-  if (http.begin(client, serverUrl)) {
+  if (http.begin(cliente, BACKEND_URL)) {
     http.addHeader("Content-Type", "application/json");
 
-    // Construir JSON
-    // El backend espera: { "nivelFatiga": X, "tipo_alerta": "Y", "mensaje": "Z", "usuarioId": 1 }
-    // Asumimos usuario 1 por defecto si no hay login en el ESP32
-    String jsonPayload = "{";
-    jsonPayload += "\"nivelFatiga\": " + String(nivel) + ",";
-    jsonPayload += "\"tipo_alerta\": \"" + tipo + "\",";
-    jsonPayload += "\"mensaje\": \"" + mensaje + "\",";
-    jsonPayload += "\"usuarioId\": 1"; // ⬅️ ID DE USUARIO (quemado para demo)
-    jsonPayload += "}";
+    String json = "{";
+    json += "\"nivelFatiga\":10,";
+    json += "\"tipo_alerta\":\"microsueno\",";
+    json += "\"mensaje\":\"Microsueño detectado - 2 parpadeos largos\",";
+    json += "\"usuarioId\":" + String(USUARIO_ID);
+    json += "}";
 
-    Serial.print("📦 Payload: ");
-    Serial.println(jsonPayload);
+    int codigo = http.POST(json);
+    Serial.print("Respuesta: ");
+    Serial.println(codigo);
+    http.end();
+  }
+}
 
-    int httpResponseCode = http.POST(jsonPayload);
+// ==========================================
+// 📊 ENVIAR STATUS (BATERÍA)
+// ==========================================
+void enviarStatus() {
+  if (WiFi.status() != WL_CONNECTED) return;
 
-    if (httpResponseCode > 0) {
-      String response = http.getString();
-      Serial.print("✅ Respuesta Servidor (");
-      Serial.print(httpResponseCode);
-      Serial.print("): ");
-      Serial.println(response);
-      lastAlertSentMs = millis();
-    } else {
-      Serial.print("❌ Error enviando POST: ");
-      Serial.println(httpResponseCode);
+  WiFiClientSecure cliente;
+  cliente.setInsecure();
+  
+  HTTPClient http;
+  
+  if (http.begin(cliente, STATUS_URL)) {
+    http.addHeader("Content-Type", "application/json");
+
+    String json = "{";
+    json += "\"usuarioId\":" + String(USUARIO_ID) + ",";
+    json += "\"bateria\":" + String(nivelBateria, 1) + ",";
+    json += "\"conectado\":true,";
+    json += "\"alarmaActiva\":" + String(alarmaActiva ? "true" : "false");
+    json += "}";
+
+    int codigo = http.POST(json);
+    if (codigo == 200 || codigo == 201) {
+      Serial.print("Status enviado. Bateria: ");
+      Serial.print(nivelBateria);
+      Serial.println("%");
     }
     http.end();
-  } else {
-    Serial.println("❌ No se pudo conectar al servidor.");
   }
 }
 
 // ==========================================
-// 🏁 SETUP & LOOP
+// 🏁 SETUP
 // ==========================================
 void setup() {
+  delay(1000);
   Serial.begin(115200);
-  delay(3000); // 🕒 ESPERAR 3 SEGUNDOS para que te de tiempo de abrir el Monitor Serie
+  while (!Serial) delay(10);
+  delay(500);
 
-  Serial.println("\n\n\n"); // Espacio en blanco
+  Serial.println();
   Serial.println("================================");
-  Serial.println("� INICIANDO ESP32 ALERTA VISION");
+  Serial.println("ALERTA VISION - ESP32-C3");
+  Serial.println("Con bateria + WiFi");
   Serial.println("================================");
 
-  // Configurar Pines
-  pinMode(IR_PIN, INPUT_PULLUP);
-  pinMode(BUZZER_PIN, OUTPUT);
-  digitalWrite(BUZZER_PIN, LOW);
+  pinMode(PIN_SENSOR, INPUT_PULLUP);
+  pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_BATERIA, INPUT);
+  digitalWrite(PIN_BUZZER, LOW);
 
-  // Estado Inicial
-  lastRaw = digitalRead(IR_PIN);
-  stableState = lastRaw;
-  lastChangeMs = millis();
+  lecturaAnterior = digitalRead(PIN_SENSOR);
+  estadoEstable = lecturaAnterior;
+  tiempoUltimoCambio = millis();
 
-  // Conectar a internet
-  connectToWiFi();
+  // Leer batería inicial
+  nivelBateria = leerBateria();
+  Serial.print("Bateria: ");
+  Serial.print(nivelBateria);
+  Serial.println("%");
 
-  // Sonido de inicio (Bip-Bip)
-  digitalWrite(BUZZER_PIN, HIGH); delay(100);
-  digitalWrite(BUZZER_PIN, LOW); delay(100);
-  digitalWrite(BUZZER_PIN, HIGH); delay(100);
-  digitalWrite(BUZZER_PIN, LOW);
+  // Conectar WiFi
+  conectarWiFi();
+
+  // Bips de inicio
+  digitalWrite(PIN_BUZZER, HIGH);
+  delay(100);
+  digitalWrite(PIN_BUZZER, LOW);
+  delay(100);
+  digitalWrite(PIN_BUZZER, HIGH);
+  delay(100);
+  digitalWrite(PIN_BUZZER, LOW);
+
+  Serial.println();
+  Serial.println("LISTO! Monitoreando...");
+  Serial.println("2 parpadeos largos (>2s) en 30s = ALARMA");
+  Serial.println();
 }
 
+// ==========================================
+// 🔄 LOOP
+// ==========================================
 void loop() {
-  unsigned long now = millis();
-  int raw = digitalRead(IR_PIN);
+  unsigned long ahora = millis();
+  int lectura = digitalRead(PIN_SENSOR);
 
-  // 1. Filtrado de ruido (Debounce)
-  if (raw != lastRaw) {
-    lastRaw = raw;
-    lastChangeMs = now;
+  // Reconectar WiFi
+  if (WiFi.status() != WL_CONNECTED) {
+    static unsigned long ultimoIntento = 0;
+    if (ahora - ultimoIntento > 30000) {
+      conectarWiFi();
+      ultimoIntento = ahora;
+    }
   }
 
-  if (raw != stableState && (now - lastChangeMs) >= STABLE_MS) {
-    int prev = stableState;
-    stableState = raw;
+  // Enviar status periódicamente
+  if (ahora - ultimoEnvioStatus > ENVIO_STATUS_INTERVAL) {
+    nivelBateria = leerBateria();
+    enviarStatus();
+    ultimoEnvioStatus = ahora;
+  }
 
-    bool prevClosed = isClosed(prev);
-    bool nowClosed  = isClosed(stableState);
+  // Filtro anti-rebote
+  if (lectura != lecturaAnterior) {
+    lecturaAnterior = lectura;
+    tiempoUltimoCambio = ahora;
+  }
 
-    // Evento: Ojo se acaba de CERRAR
-    if (!prevClosed && nowClosed) {
+  // Procesar cambio
+  if (lectura != estadoEstable && (ahora - tiempoUltimoCambio) >= TIEMPO_FILTRO) {
+    int anterior = estadoEstable;
+    estadoEstable = lectura;
+
+    bool cerradoAntes = (anterior == LOW);
+    bool cerradoAhora = (estadoEstable == LOW);
+
+    // Ojo se CERRÓ
+    if (!cerradoAntes && cerradoAhora) {
       ojoCerrado = true;
-      closedStartMs = now;
-      Serial.println("📉 Ojo CERRADO - Iniciando cronómetro...");
+      tiempoInicioCierre = ahora;
+      Serial.println(">>> OJO CERRADO");
     }
 
-    // Evento: Ojo se acaba de ABRIR
-    if (prevClosed && !nowClosed && ojoCerrado) {
-      unsigned long duracion = now - closedStartMs;
+    // Ojo se ABRIÓ
+    if (cerradoAntes && !cerradoAhora && ojoCerrado) {
+      unsigned long duracion = ahora - tiempoInicioCierre;
       ojoCerrado = false;
-      
-      digitalWrite(BUZZER_PIN, LOW); // Asegurar buzzer apagado
 
-      if (duracion >= CLOSED_LONG_MS) {
-        Serial.print("⚠️ MICROSUEÑO FINALIZADO (Duración: ");
-        Serial.print(duracion);
-        Serial.println(" ms)");
-      } else {
-        Serial.print("👁️ Parpadeo normal (");
-        Serial.print(duracion);
-        Serial.println(" ms)");
+      Serial.print(">>> OJO ABIERTO - ");
+      Serial.print(duracion);
+      Serial.println(" ms");
+
+      // ¿Fue un parpadeo LARGO?
+      if (duracion >= TIEMPO_PARPADEO_LARGO) {
+        Serial.println("!!! PARPADEO LARGO !!!");
+
+        // Si pasó mucho tiempo desde el primer parpadeo, reiniciar
+        if (contadorParpadosLargos > 0 && (ahora - tiempoPrimerParpadeo > VENTANA_TIEMPO)) {
+          Serial.println("Ventana expirada, reiniciando contador");
+          contadorParpadosLargos = 0;
+        }
+
+        // Guardar tiempo del primer parpadeo
+        if (contadorParpadosLargos == 0) {
+          tiempoPrimerParpadeo = ahora;
+        }
+
+        contadorParpadosLargos++;
+
+        Serial.print("Contador: ");
+        Serial.print(contadorParpadosLargos);
+        Serial.println("/2 (en ventana de 30s)");
+
+        // ¿Ya van 2?
+        if (contadorParpadosLargos >= 2 && !alarmaActiva) {
+          Serial.println();
+          Serial.println("!!! ALARMA ACTIVADA !!!");
+          Serial.println();
+          alarmaActiva = true;
+          tiempoInicioAlarma = ahora;
+          contadorParpadosLargos = 0;
+          
+          enviarAlerta();
+          enviarStatus();
+        }
       }
     }
   }
 
-  // 2. Comprobación continua: ¿Sigue cerrado?
-  if (ojoCerrado) {
-    unsigned long tiempoCerrado = now - closedStartMs;
+  // Alarma
+  if (alarmaActiva) {
+    if ((ahora / 200) % 2 == 0) {
+      digitalWrite(PIN_BUZZER, HIGH);
+    } else {
+      digitalWrite(PIN_BUZZER, LOW);
+    }
 
-    // Si supera el umbral de microsueño (2 seg)
-    if (tiempoCerrado >= CLOSED_LONG_MS) {
-      
-      // A. Activar Alarma Local
-      digitalWrite(BUZZER_PIN, HIGH);
-      
-      // B. Enviar Alerta al Backend (una sola vez por evento, controlado por cooldown)
-      if (tiempoCerrado >= (CLOSED_LONG_MS + 100) && (now - lastAlertSentMs > ALERT_COOLDOWN_MS)) {
-        Serial.println("🚨 ¡ALERTA CRÍTICA ACTIVADA!");
-        sendFatigueAlert(10, "microsueno", "Conductor dormido por > 2s");
-        // Nota: lastAlertSentMs se actualiza dentro de la función si tiene éxito
-        // Pero para asegurar que no spamee si falla, actualizamos aquí también un poco
-        lastAlertSentMs = now; 
-      }
+    // Auto-apagar 30 seg
+    if (ahora - tiempoInicioAlarma > 30000) {
+      Serial.println("Alarma auto-apagada");
+      alarmaActiva = false;
+      digitalWrite(PIN_BUZZER, LOW);
+      enviarStatus();
     }
   } else {
-    // Si el ojo está abierto, buzzer apagado
-    digitalWrite(BUZZER_PIN, LOW);
-    
-    // Si perdió WiFi, intentar reconectar periódicamente (opcional)
-    if (WiFi.status() != WL_CONNECTED && (now % 10000 == 0)) {
-       WiFi.reconnect();
-    }
+    digitalWrite(PIN_BUZZER, LOW);
   }
 
-  delay(10); // Pequeño respiro a la CPU
+  delay(10);
 }

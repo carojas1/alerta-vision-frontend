@@ -27,7 +27,7 @@ export class HistoryComponent implements OnInit {
   constructor(
     private alertService: AlertService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Obtener teléfono para WhatsApp (no necesario para la consulta)
@@ -71,10 +71,19 @@ export class HistoryComponent implements OnInit {
 
         this.loading = false;
       },
-      error: (err: unknown) => {
+      error: (err: any) => {
         console.error('❌ Error cargando alertas:', err);
-        this.error = 'No se pudo conectar con el servidor. Verifica tu conexión.';
-        this.lensStatus = 'error';
+
+        // Si es 404, mostrar como "sin alertas" en vez de error
+        if (err.status === 404) {
+          this.alertas = [];
+          this.lensStatus = 'sin_alertas';
+          this.error = undefined;
+          console.log('📭 Endpoint no encontrado, mostrando vacío');
+        } else {
+          this.error = 'No se pudo conectar con el servidor. Verifica tu conexión.';
+          this.lensStatus = 'error';
+        }
         this.loading = false;
       }
     });

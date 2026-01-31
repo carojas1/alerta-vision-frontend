@@ -1,7 +1,14 @@
 <div class="home-container">
   <!-- HEADER -->
   <div class="header">
-    <img src="/logo-alertavision.png" class="logo" alt="AlertaVisión" />
+    <!-- Logo clickeable para ver batería -->
+    <img 
+      src="/logo-alertavision.png" 
+      class="logo clickable" 
+      alt="AlertaVisión" 
+      (click)="onLogoClick()"
+      title="Ver estado de la batería"
+    />
 
     <div class="header-actions">
       <div class="profile-pill" (click)="toggleProfile()">
@@ -47,6 +54,14 @@
   <div class="status-card">
     <h2 *ngIf="!lentesConectados">No se detectan los lentes</h2>
     <h2 *ngIf="lentesConectados">✅ Lentes conectados</h2>
+
+    <!-- Mostrar batería si está conectado -->
+    <div class="battery-indicator" *ngIf="lentesConectados">
+      <span class="battery-icon">🔋</span>
+      <span class="battery-level" [style.color]="getBatteryColor()">
+        {{ batteryLevel }}%
+      </span>
+    </div>
 
     <p class="subtitle" *ngIf="!lentesConectados">
       Enciende tus lentes y acércalos para vincular.
@@ -105,6 +120,71 @@
     /><span>Reportes</span>
   </div>
 </nav>
+
+<!-- MODAL BATERÍA -->
+<div class="battery-backdrop" *ngIf="showBatteryModal" (click)="closeBatteryModal()"></div>
+
+<div class="battery-modal" *ngIf="showBatteryModal">
+  <div class="battery-modal-header">
+    <h3>🔋 Estado de los Lentes</h3>
+    <button class="close-btn" (click)="closeBatteryModal()">✕</button>
+  </div>
+
+  <div class="battery-modal-body">
+    <!-- Loading -->
+    <div *ngIf="batteryLoading" class="battery-loading">
+      <div class="spinner"></div>
+      <p>Obteniendo estado...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!batteryLoading && batteryError" class="battery-error">
+      <span>❌</span>
+      <p>{{ batteryError }}</p>
+    </div>
+
+    <!-- Datos -->
+    <div *ngIf="!batteryLoading && !batteryError" class="battery-content">
+      <div class="battery-big" [style.color]="getBatteryColor()">
+        <span class="battery-icon-big">{{ getBatteryIcon() }}</span>
+        <span class="battery-value">{{ batteryLevel }}%</span>
+      </div>
+
+      <div class="battery-status">
+        <div class="status-row">
+          <span class="label">Estado:</span>
+          <span class="value" [class.connected]="lentesConectados" [class.disconnected]="!lentesConectados">
+            {{ lentesConectados ? '✅ Conectados' : '❌ Desconectados' }}
+          </span>
+        </div>
+        <div class="status-row" *ngIf="lastBatteryUpdate">
+          <span class="label">Última actualización:</span>
+          <span class="value">{{ lastBatteryUpdate }}</span>
+        </div>
+      </div>
+
+      <div class="battery-bar-container">
+        <div class="battery-bar-fill" 
+             [style.width.%]="batteryLevel"
+             [style.background]="getBatteryColor()">
+        </div>
+      </div>
+
+      <p class="battery-tip" *ngIf="batteryLevel <= 20">
+        ⚠️ Batería baja. Considera cargar tus lentes.
+      </p>
+    </div>
+  </div>
+
+  <div class="battery-modal-footer">
+    <button class="btn-refresh" (click)="fetchBatteryLevel()">
+      🔄 Actualizar
+    </button>
+    <button class="btn-close" (click)="closeBatteryModal()">
+      Cerrar
+    </button>
+  </div>
+</div>
 
 <!-- MODAL PERFIL -->
 <div class="profile-backdrop" *ngIf="showProfileModal" (click)="toggleProfile()"></div>

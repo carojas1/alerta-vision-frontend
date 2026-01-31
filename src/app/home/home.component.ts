@@ -1,10 +1,11 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 
 import { AuthService } from '../services/auth.service';
+import { environment } from '../enviromets/environment';
 
 @Component({
   selector: 'app-home',
@@ -13,7 +14,7 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   userName = '';
   userEmail = '';
   fatigaLevel = 0;
@@ -28,15 +29,25 @@ export class HomeComponent implements OnInit {
   lentesConectados = false;
   errorConexionLentes = '';
 
-  // URL base de tu backend en Render
-  private backendBase = 'https://alerta-vision-backend.onrender.com';
+  // 🔋 Batería de los lentes
+  showBatteryModal = false;
+  batteryLevel = 0;
+  batteryLoading = false;
+  batteryError = '';
+  lastBatteryUpdate = '';
+
+  // URL base del backend
+  private backendBase = environment.apiUrl;
+
+  // Polling interval
+  private statusInterval: any = null;
 
   constructor(
     private router: Router,
     private auth: AuthService,
     private http: HttpClient,
     @Inject(DOCUMENT) private document: Document,
-  ) {}
+  ) { }
 
   ngOnInit() {
     if (typeof window !== 'undefined' && localStorage) {
@@ -53,8 +64,113 @@ export class HomeComponent implements OnInit {
       this.userEmail = localStorage.getItem('userEmail') || 'usuario@app.com';
     }
 
-    // Animación barra de “Detectando fatigas”
+    // Animación barra de "Detectando fatigas"
     setTimeout(() => (this.fatigaLevel = 100), 400);
+
+    // Iniciar polling del status de lentes
+    this.startStatusPolling();
+  }
+
+  ngOnDestroy() {
+    this.stopStatusPolling();
+  }
+
+  // -------- POLLING STATUS LENTES --------
+  startStatusPolling() {
+    // Consultar cada 15 segundos
+    this.statusInterval = setInterval(() => {
+      this.fetchLensStatus();
+    }, 15000);
+
+    // Primera consulta inmediata
+    this.fetchLensStatus();
+  }
+
+  stopStatusPolling() {
+    if (this.statusInterval) {
+      clearInterval(this.statusInterval);
+      this.statusInterval = null;
+    }
+  }
+
+  fetchLensStatus() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    this.http.get(`${this.backendBase}/lentes/status`, { headers }).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.batteryLevel = res.bateria || 0;
+          this.lentesConectados = res.conectado || false;
+          this.lastBatteryUpdate = new Date().toLocaleTimeString();
+          console.log('📊 Status lentes:', res);
+        }
+      },
+      error: (err) => {
+        // Silencioso si falla (el endpoint puede no existir aún)
+        console.log('Status lentes no disponible');
+      }
+    });
+  }
+
+  // -------- BATERÍA --------
+  onLogoClick() {
+    this.showBatteryModal = true;
+    this.batteryLoading = true;
+    this.batteryError = '';
+    this.fetchBatteryLevel();
+  }
+
+  closeBatteryModal() {
+    this.showBatteryModal = false;
+  }
+
+  fetchBatteryLevel() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.batteryLoading = false;
+      this.batteryError = 'No hay sesión activa';
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    this.http.get(`${this.backendBase}/lentes/status`, { headers }).subscribe({
+      next: (res: any) => {
+        this.batteryLoading = false;
+        if (res && res.bateria !== undefined) {
+          this.batteryLevel = res.bateria;
+          this.lentesConectados = res.conectado || false;
+          this.lastBatteryUpdate = new Date().toLocaleTimeString();
+        } else {
+          this.batteryError = 'No hay datos de batería disponibles';
+        }
+      },
+      error: (err) => {
+        this.batteryLoading = false;
+        this.batteryError = 'No se pudo obtener el estado de los lentes';
+        console.error('Error obteniendo batería:', err);
+      }
+    });
+  }
+
+  getBatteryColor(): string {
+    if (this.batteryLevel > 50) return '#22c55e'; // Verde
+    if (this.batteryLevel > 20) return '#eab308'; // Amarillo
+    return '#ef4444'; // Rojo
+  }
+
+  getBatteryIcon(): string {
+    if (this.batteryLevel > 75) return '🔋';
+    if (this.batteryLevel > 50) return '🔋';
+    if (this.batteryLevel > 25) return '🪫';
+    return '🪫';
   }
 
   // -------- PERFIL --------
@@ -83,8 +199,6 @@ export class HomeComponent implements OnInit {
       alert('Primero conecta tus lentes para iniciar el monitoreo.');
       return;
     }
-
-    // Aquí más adelante podrás arrancar lógica real de monitoreo
     alert('Monitoreo iniciado con los lentes conectados.');
   }
 
@@ -108,14 +222,13 @@ export class HomeComponent implements OnInit {
       Authorization: `Bearer ${token}`,
     });
 
-    // Ping sencillo al backend para validar token y usuario
     this.http.get(`${this.backendBase}/users/me`, { headers }).subscribe({
       next: (res: any) => {
         console.log('✅ Conexión backend OK, usuario:', res);
         this.conectandoLentes = false;
         this.lentesConectados = true;
         this.errorConexionLentes = '';
-        alert('Lentes vinculados correctamente al usuario (vía backend).');
+        alert('Lentes vinculados correctamente al usuario.');
       },
       error: (err) => {
         console.error('❌ Error conectando lentes:', err);
@@ -139,6 +252,7 @@ export class HomeComponent implements OnInit {
   }
 
   logout() {
+    this.stopStatusPolling();
     this.auth.logout?.();
     localStorage.clear();
     this.router.navigate(['/login']);

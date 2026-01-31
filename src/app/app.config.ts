@@ -1,17 +1,18 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideHttpClient, withFetch } from '@angular/common/http'; // Importa withFetch
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { routes } from './app.routes';
-
-// ¡YA NO IMPORTAMOS NADA DE ANIMATIONS!
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     importProvidersFrom(BrowserModule, FormsModule, ReactiveFormsModule),
-    provideHttpClient(withFetch()),     // Arregla el error NG02801 (fetch)
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([AuthInterceptor])  // ✅ AHORA SÍ SE ADJUNTA EL TOKEN
+    ),
     provideRouter(routes),
-    // ¡YA NO 'ENCENDEMOS' LAS ANIMACIONES!
   ],
 };
