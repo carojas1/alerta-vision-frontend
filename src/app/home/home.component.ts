@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { AuthService } from '../services/auth.service';
 import { environment } from '../enviromets/environment';
@@ -10,7 +10,7 @@ import { environment } from '../enviromets/environment';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
@@ -149,11 +149,8 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
-    this.http.get(`${this.backendBase}/users/me`, { headers }).subscribe({
+    // ✅ El AuthInterceptor añade automáticamente el header Authorization
+    this.http.get(`${this.backendBase}/users/me`).subscribe({
       next: (res: any) => {
         console.log('✅ Conexión backend OK, usuario:', res);
         this.conectandoLentes = false;
