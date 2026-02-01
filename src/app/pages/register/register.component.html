@@ -4,14 +4,16 @@
       <img src="/logo-alertavision.png" alt="AlertaVisión" class="logo" />
     </div>
     <div class="register-title">Registrarse</div>
+    
     <form (ngSubmit)="onRegister()">
       <div class="input-group">
         <input
           type="text"
           [(ngModel)]="nombre"
           name="nombre"
-          placeholder="Nombre"
+          placeholder="Nombre completo"
           required
+          [disabled]="loading"
         />
       </div>
 
@@ -22,17 +24,18 @@
           name="email"
           placeholder="Correo electrónico"
           required
+          [disabled]="loading"
         />
       </div>
 
-      <!-- Input teléfono -->
       <div class="input-group">
         <input
           type="text"
           [(ngModel)]="telefono"
           name="telefono"
-          placeholder="Teléfono"
+          placeholder="Teléfono (ej: 0987654321)"
           required
+          [disabled]="loading"
         />
       </div>
 
@@ -41,8 +44,9 @@
           [type]="showPassword ? 'text' : 'password'"
           [(ngModel)]="password"
           name="password"
-          placeholder="Contraseña"
+          placeholder="Contraseña (mínimo 6 caracteres)"
           required
+          [disabled]="loading"
         />
         <button type="button" class="eye-btn" (click)="togglePassword()" tabindex="-1">
           <img
@@ -53,13 +57,28 @@
         </button>
       </div>
 
-      <button class="register-btn" [disabled]="loading" type="submit">
-        {{ loading ? 'Registrando...' : 'Registrarse' }}
+      <button class="register-btn" [disabled]="loading || !nombre || !email || !telefono || !password" type="submit">
+        <span *ngIf="!loading">Crear cuenta</span>
+        <span *ngIf="loading">Registrando...</span>
       </button>
 
       <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
       <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
     </form>
+
+    <!-- Separador -->
+    <div class="divider">
+      <span>o regístrate con</span>
+    </div>
+
+    <!-- Botón de Google -->
+    <button 
+      class="google-btn" 
+      (click)="onGoogleRegister()"
+      [disabled]="loading">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+      <span>Continuar con Google</span>
+    </button>
 
     <div class="login-link">
       ¿Ya tienes una cuenta?

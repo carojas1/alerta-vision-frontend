@@ -58,32 +58,47 @@
   color: var(--color-text-secondary);
 }
 .eye-btn {
-  position: absolute; right: 10px; top: 50%;
+  position: absolute;
+  right: 10px;
+  top: 50%;
   transform: translateY(-50%);
-  background: none; border: none; outline: none; padding: 0;
-  display: flex; align-items: center; cursor: pointer;
-  height: 30px; width: 30px;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
 }
 .eye-icon {
-  width: 25px; height: 25px;
-  filter: invert(50%) sepia(13%) saturate(1477%) hue-rotate(183deg) brightness(97%) contrast(87%);
+  width: 25px;
+  height: 25px;
+  filter: invert(50%) sepia(13%) saturate(1477%) hue-rotate(183deg)
+    brightness(97%) contrast(87%);
 }
 body.light-mode .eye-icon {
   filter: none;
 }
 .register-btn {
-  width: 100%; padding: 1.08rem 0;
+  width: 100%;
+  padding: 1.08rem 0;
   background: var(--color-btn-gradient);
-  color: #FFFFFF;
-  border: none; border-radius: 11px;
-  font-weight: 800; font-size: 1.18rem;
-  margin-top: 0.9rem; transition: all 0.2s ease-out;
+  color: #ffffff;
+  border: none;
+  border-radius: 11px;
+  font-weight: 800;
+  font-size: 1.18rem;
+  margin-top: 0.9rem;
+  transition: all 0.2s ease-out;
   box-shadow: 0 4px 15px var(--color-glow-shadow);
 }
 .register-btn:disabled {
   background: var(--color-btn-disabled);
   color: var(--color-btn-disabled-text);
-  cursor: not-allowed; box-shadow: none;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 .register-btn:not(:disabled):hover {
   background: var(--color-btn-gradient-hover);
@@ -92,23 +107,34 @@ body.light-mode .eye-icon {
 }
 .error-message {
   color: var(--color-accent-yellow);
-  font-size: 1.09rem; margin: -5px 0 9px 0;
-  min-height: 20px; text-align: center;
+  font-size: 1.09rem;
+  margin: -5px 0 9px 0;
+  min-height: 20px;
+  text-align: center;
 }
 .login-link {
-  margin-top: 1.1rem; font-size: 1.10rem;
+  margin-top: 1.1rem;
+  font-size: 1.1rem;
   color: var(--color-text-secondary);
 }
 .login-link a {
   color: var(--color-primary);
-  font-weight: 700; text-decoration: none;
-  margin-left: 3px; position: relative; padding-bottom: 3px;
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 3px;
+  position: relative;
+  padding-bottom: 3px;
 }
 .login-link a::after {
-  content: ''; position: absolute; bottom: 0; left: 0;
-  width: 100%; height: 2px;
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
   background-color: var(--color-primary-hover);
-  transform: scaleX(0); transform-origin: center;
+  transform: scaleX(0);
+  transform-origin: center;
   transition: transform 0.3s ease-out;
 }
 .login-link a:hover {
@@ -116,4 +142,67 @@ body.light-mode .eye-icon {
 }
 .login-link a:hover::after {
   transform: scaleX(1);
+}
+
+.success-message {
+  color: #4ade80;
+  font-size: 1.09rem;
+  margin: -5px 0 9px 0;
+  min-height: 20px;
+  text-align: center;
+}
+
+/* === Divider === */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  color: var(--color-text-tertiary);
+  font-size: 0.9rem;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.divider span {
+  padding: 0 1rem;
+}
+
+/* === Google Button === */
+.google-btn {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  background: #ffffff;
+  color: #1f1f1f;
+  border: 1px solid #dadce0;
+  border-radius: 11px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.google-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+.google-btn:hover:not(:disabled) {
+  background: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.google-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

@@ -1,9 +1,7 @@
 <div class="login-bg">
   <div class="login-card">
     <div class="logo-login-container">
-      
       <img src="/logo-alertavision.png" class="logo-login" alt="AlertaVisión" />
-
     </div>
 
     <h2 class="login-title">
@@ -18,6 +16,7 @@
           [(ngModel)]="email"
           placeholder="Correo electrónico"
           required
+          [disabled]="loading"
         />
       </div>
 
@@ -28,6 +27,7 @@
           [(ngModel)]="password"
           placeholder="Contraseña"
           required
+          [disabled]="loading"
         />
         <button type="button" class="eye-btn" (click)="togglePassword()" tabindex="-1">
           <img
@@ -43,11 +43,26 @@
       <button
         type="submit"
         class="login-btn"
-        [disabled]="!email || !password"
+        [disabled]="!email || !password || loading"
       >
-        Ingresar
+        <span *ngIf="!loading">Ingresar</span>
+        <span *ngIf="loading">Cargando...</span>
       </button>
     </form>
+
+    <!-- Separador -->
+    <div class="divider">
+      <span>o continúa con</span>
+    </div>
+
+    <!-- Botón de Google -->
+    <button 
+      class="google-btn" 
+      (click)="onGoogleLogin()"
+      [disabled]="loading">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+      <span>Iniciar con Google</span>
+    </button>
 
     <div class="register-link">
       ¿No tienes una cuenta?
@@ -65,14 +80,10 @@
 
 <div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    
     <h2>Política de Privacidad – Alerta Visión</h2>
-    
     <p><strong>1. Introducción</strong></p>
     <p>Alerta Visión es un sistema diseñado para brindar monitoreo preventivo...</p>
     <p>...trabajamos continuamente para fortalecer nuestra infraestructura y reducir riesgos.</p>
-
     <button class="modal-close-btn" (click)="closeModal()">Entendido</button>
-
   </div>
 </div>
