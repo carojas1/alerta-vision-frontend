@@ -36,53 +36,113 @@ export class ReportsComponent implements OnInit {
   mejorDia = 0;
   peorDia = 0;
 
+  // Configuración de gráfico de barras (Diario)
   barData: ChartConfiguration<'bar'>['data'] = {
     labels: [],
-    datasets: [{ data: [], label: 'Somnolencia', backgroundColor: '#38bdf8' }]
+    datasets: [{
+      data: [],
+      label: 'Alertas',
+      backgroundColor: 'rgba(0, 212, 255, 0.7)',
+      borderColor: '#00d4ff',
+      borderWidth: 1,
+      borderRadius: 8,
+    }]
   };
   barOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
-    scales: { y: { beginAtZero: true, max: 100 } }
+    plugins: {
+      legend: {
+        display: true,
+        labels: { color: 'rgba(255,255,255,0.7)', font: { size: 12 } }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(255,255,255,0.05)' },
+        ticks: { color: 'rgba(255,255,255,0.5)' }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { color: 'rgba(255,255,255,0.5)' }
+      }
+    }
   };
 
+  // Configuración de gráfico de línea (Semanal)
   lineData: ChartConfiguration<'line'>['data'] = {
     labels: [],
-    datasets: [
-      {
-        data: [],
-        label: 'Semana',
-        tension: 0.3,
-        fill: false,
-        borderColor: '#3b82f6',
-        pointRadius: 4
-      }
-    ]
+    datasets: [{
+      data: [],
+      label: 'Alertas',
+      tension: 0.4,
+      fill: true,
+      backgroundColor: 'rgba(0, 212, 255, 0.1)',
+      borderColor: '#00d4ff',
+      borderWidth: 3,
+      pointRadius: 6,
+      pointBackgroundColor: '#00d4ff',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+    }]
   };
   lineOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
-    scales: { y: { beginAtZero: true, max: 100 } }
+    plugins: {
+      legend: {
+        display: true,
+        labels: { color: 'rgba(255,255,255,0.7)', font: { size: 12 } }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(255,255,255,0.05)' },
+        ticks: { color: 'rgba(255,255,255,0.5)' }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { color: 'rgba(255,255,255,0.5)' }
+      }
+    }
   };
 
+  // Configuración de gráfico dona (Mensual)
   donutData: ChartConfiguration<'doughnut'>['data'] = {
     labels: [],
-    datasets: [
-      {
-        data: [],
-        backgroundColor: [
-          '#0ea5e9',
-          '#22c55e',
-          '#eab308',
-          '#ef4444',
-          '#6366f1'
-        ]
-      }
-    ]
+    datasets: [{
+      data: [],
+      backgroundColor: [
+        '#00d4ff',
+        '#00ff88',
+        '#ffcc00',
+        '#ff6b6b',
+        '#a855f7',
+        '#06b6d4',
+        '#84cc16'
+      ],
+      borderWidth: 0,
+    }]
   };
   donutOptions: ChartOptions<'doughnut'> = {
     responsive: true,
-    maintainAspectRatio: false
+    maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        labels: {
+          color: 'rgba(255,255,255,0.7)',
+          font: { size: 11 },
+          padding: 15,
+          usePointStyle: true,
+          pointStyle: 'circle'
+        }
+      }
+    }
   };
 
   constructor(
@@ -90,9 +150,18 @@ export class ReportsComponent implements OnInit {
     private auth: AuthService,
     private router: Router,
     @Inject(DOCUMENT) private document: Document
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+    // ✅ VERIFICAR TOKEN ANTES DE HACER CUALQUIER COSA
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+    if (!token) {
+      console.log('⚠️ No hay token, redirigiendo a login...');
+      this.router.navigate(['/login']);
+      return;
+    }
+
     const user = this.auth.currentUser as any;
     if (user) {
       this.userId = user.id?.toString() ?? null;
@@ -125,10 +194,19 @@ export class ReportsComponent implements OnInit {
     const to = hoy.toISOString().split('T')[0];
 
     const desde = new Date(hoy);
-    if (this.activeTab === 'semanal') desde.setDate(hoy.getDate() - 7);
-    if (this.activeTab === 'mensual') desde.setMonth(hoy.getMonth() - 1);
 
-    return { from: desde.toISOString().split('T')[0], to };
+    if (this.activeTab === 'diario') {
+      // Para diario, usar el mismo día (from = to)
+      // El backend debe incluir todo el día
+    } else if (this.activeTab === 'semanal') {
+      desde.setDate(hoy.getDate() - 7);
+    } else if (this.activeTab === 'mensual') {
+      desde.setMonth(hoy.getMonth() - 1);
+    }
+
+    const from = desde.toISOString().split('T')[0];
+    console.log('📅 Rango de fechas:', { from, to, tab: this.activeTab });
+    return { from, to };
   }
 
   cargarDatos() {
@@ -156,10 +234,19 @@ export class ReportsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error reportes:', err);
+
+        // Si es 401, redirigir a login
+        if (err.status === 401) {
+          console.log('🔄 Token inválido, redirigiendo a login...');
+          localStorage.removeItem('token');
+          this.router.navigate(['/login']);
+          return;
+        }
+
         this.errorMsg = 'No se pudieron cargar los reportes.';
         this.loading = false;
 
-        // Dejar los gráficos en estado vacío, pero sin romper
+        // Dejar los gráficos en estado vacío
         this.actualizarGraficos({ labels: [], values: [] });
         this.actualizarKpis({ labels: [], values: [] });
       }
@@ -247,8 +334,8 @@ export class ReportsComponent implements OnInit {
       this.activeTab === 'diario'
         ? 'daily'
         : this.activeTab === 'semanal'
-        ? 'weekly'
-        : 'monthly';
+          ? 'weekly'
+          : 'monthly';
 
     this.reportsService.exportarPorCorreo(tabBackend, email).subscribe({
       next: (res) => {

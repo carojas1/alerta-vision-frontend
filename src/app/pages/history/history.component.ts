@@ -14,14 +14,10 @@ type LensStatus = 'desconocido' | 'ok' | 'sin_alertas' | 'error';
 })
 export class HistoryComponent implements OnInit {
 
-  // ✅ Variable única: alertas (igual en TS y HTML)
   alertas: Alerta[] = [];
   loading = false;
   error?: string;
-
   loggedInUserPhone: string | null = null;
-
-  // Estado de los lentes / API
   lensStatus: LensStatus = 'desconocido';
 
   constructor(
@@ -30,31 +26,28 @@ export class HistoryComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Obtener teléfono para WhatsApp (no necesario para la consulta)
-    this.loggedInUserPhone =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('userPhone')
-        : null;
+    // ✅ VERIFICAR TOKEN ANTES DE HACER CUALQUIER COSA
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
-    // ✅ Cargar alertas sin necesidad de userId (el JWT tiene la info)
+    if (!token) {
+      console.log('⚠️ No hay token, redirigiendo a login...');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.loggedInUserPhone = localStorage.getItem('userPhone') || null;
     this.cargarAlertas();
   }
 
-  /**
-   * ✅ Carga alertas usando getMyAlerts() - sin userId en URL
-   * El backend identifica al usuario por el JWT token
-   */
   cargarAlertas(): void {
     this.loading = true;
     this.error = undefined;
     this.lensStatus = 'desconocido';
 
-    // ✅ Llamar al método correcto sin pasar userId
     this.alertService.getMyAlerts().subscribe({
       next: (data: Alerta[]) => {
         console.log('📥 ALERTAS RECIBIDAS:', data);
 
-        // Ordenar por fecha (más recientes primero)
         this.alertas = (data || []).sort((a, b) => {
           const da = this.getDate(a);
           const db = this.getDate(b);
@@ -63,10 +56,8 @@ export class HistoryComponent implements OnInit {
 
         if (this.alertas.length > 0) {
           this.lensStatus = 'ok';
-          console.log('✅ Alertas cargadas:', this.alertas.length);
         } else {
           this.lensStatus = 'sin_alertas';
-          console.log('📭 No hay alertas para este usuario');
         }
 
         this.loading = false;
@@ -74,14 +65,21 @@ export class HistoryComponent implements OnInit {
       error: (err: any) => {
         console.error('❌ Error cargando alertas:', err);
 
-        // Si es 404, mostrar como "sin alertas" en vez de error
+        // Si es 401, redirigir a login
+        if (err.status === 401) {
+          console.log('🔄 Token inválido, redirigiendo a login...');
+          localStorage.removeItem('token');
+          this.router.navigate(['/login']);
+          return;
+        }
+
+        // Si es 404, mostrar como "sin alertas"
         if (err.status === 404) {
           this.alertas = [];
           this.lensStatus = 'sin_alertas';
           this.error = undefined;
-          console.log('📭 Endpoint no encontrado, mostrando vacío');
         } else {
-          this.error = 'No se pudo conectar con el servidor. Verifica tu conexión.';
+          this.error = 'No se pudo conectar con el servidor.';
           this.lensStatus = 'error';
         }
         this.loading = false;
@@ -89,31 +87,19 @@ export class HistoryComponent implements OnInit {
     });
   }
 
-  /**
-   * Extrae la fecha de una alerta (soporta múltiples formatos)
-   */
   private getDate(alert: Alerta): Date {
     const raw = alert.fecha || alert.createdAt || alert.created_at || '';
     return raw ? new Date(raw) : new Date(0);
   }
 
-  /**
-   * Codifica texto para URL (WhatsApp)
-   */
   encode(text?: string): string {
     return encodeURIComponent(text || '');
   }
 
-  /**
-   * Obtiene el mensaje de una alerta (soporta múltiples formatos)
-   */
   getMensaje(alert: Alerta): string {
     return alert.mensaje || alert.message || 'Alerta de fatiga detectada';
   }
 
-  /**
-   * Navegación
-   */
   goTo(path: string): void {
     this.router.navigate(['/' + path]);
   }

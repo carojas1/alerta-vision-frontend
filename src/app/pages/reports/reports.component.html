@@ -1,5 +1,5 @@
 <div class="reports-container">
-  <h1 class="title">Reportes</h1>
+  <h1 class="title">Informes</h1>
 
   <div class="tabs">
     <button class="tab" [class.active]="activeTab==='diario'" (click)="setTab('diario')">Diario</button>
@@ -9,38 +9,48 @@
   
   <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
 
+  <!-- Gráfico Diario -->
   <div class="chart-card" *ngIf="activeTab==='diario'">
     <canvas baseChart [type]="'bar'" [data]="barData" [options]="barOptions"></canvas>
-    <div class="empty" *ngIf="!loading && (!barData.datasets[0].data || !barData.datasets[0].data.length)">Sin datos en este rango.</div>
+    <div class="empty" *ngIf="!loading && (!barData.datasets[0].data || !barData.datasets[0].data.length)">
+      📊 No hay alertas hoy
+    </div>
   </div>
 
+  <!-- Gráfico Semanal -->
   <div class="chart-card" *ngIf="activeTab==='semanal'">
     <canvas baseChart [type]="'line'" [data]="lineData" [options]="lineOptions"></canvas>
-    <div class="empty" *ngIf="!loading && (!lineData.datasets[0].data || !lineData.datasets[0].data.length)">Sin datos en este rango.</div>
+    <div class="empty" *ngIf="!loading && (!lineData.datasets[0].data || !lineData.datasets[0].data.length)">
+      📈 No hay datos esta semana
+    </div>
   </div>
 
+  <!-- Gráfico Mensual -->
   <div class="chart-card" *ngIf="activeTab==='mensual'">
     <canvas baseChart [type]="'doughnut'" [data]="donutData" [options]="donutOptions"></canvas>
-    <div class="empty" *ngIf="!loading && (!donutData.datasets[0].data || !donutData.datasets[0].data.length)">Sin datos en este rango.</div>
+    <div class="empty" *ngIf="!loading && (!donutData.datasets[0].data || !donutData.datasets[0].data.length)">
+      📅 No hay datos este mes
+    </div>
   </div>
 
+  <!-- KPIs -->
   <div class="kpis">
     <div class="kpi">
-      <div class="label">Somnolencia promedio</div>
-      <div class="value">{{ promedioDia | number:'1.0-1' }}</div>
+      <div class="label">Promedio</div>
+      <div class="value">{{ promedioDia | number:'1.0-0' }}</div>
     </div>
     <div class="kpi">
-      <div class="label">Día mayor</div>
-      <div class="value">{{ mejorDia | number:'1.0-1' }}</div>
+      <div class="label">Máximo</div>
+      <div class="value">{{ mejorDia | number:'1.0-0' }}</div>
     </div>
     <div class="kpi">
-      <div class="label">Día menor</div>
-      <div class="value">{{ peorDia | number:'1.0-1' }}</div>
+      <div class="label">Mínimo</div>
+      <div class="value">{{ peorDia | number:'1.0-0' }}</div>
     </div>
   </div>
 
+  <!-- Exportar Reporte -->
   <div class="export">
-    
     <button class="btn-quick" (click)="exportarCorreoUsuario()" [disabled]="sending">
       <ng-container *ngIf="!sending; else sendingTemplate">
         <span class="btn-label">Enviar reporte a:</span>
@@ -60,8 +70,10 @@
     <div class="export-msg" *ngIf="exportMsg">{{ exportMsg }}</div>
   </div>
 
+  <!-- Ajustes -->
   <div class="settings-section">
     <h2 class="settings-title">Ajustes</h2>
+    
     <div class="setting-item">
       <span>Modo Oscuro</span>
       <label class="toggle-switch">
@@ -69,20 +81,22 @@
         <span class="slider"></span>
       </label>
     </div>
+    
     <div class="setting-item">
-      <span>Activar Notificaciones</span>
+      <span>Notificaciones</span>
       <label class="toggle-switch">
         <input type="checkbox" [checked]="notificationsEnabled" (change)="toggleNotifications()">
         <span class="slider"></span>
       </label>
     </div>
+    
     <div class="setting-item contact">
-      <span>Contacta con nosotros</span>
+      <span>Soporte</span>
       <a href="mailto:carojas@sudamericano.edu.ec" class="contact-link">carojas&#64;sudamericano.edu.ec</a>
     </div>
   </div>
 
-  <div *ngIf="loading" class="loading">Cargando…</div>
+  <div *ngIf="loading" class="loading">Cargando datos...</div>
 </div>
 
 <nav class="bottom-nav">
@@ -93,6 +107,6 @@
     <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" /><span>Alertas</span>
   </div>
   <div class="nav-btn active" (click)="goTo('reports')">
-    <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" /><span>Reportes</span>
+    <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" /><span>Informes</span>
   </div>
 </nav>
