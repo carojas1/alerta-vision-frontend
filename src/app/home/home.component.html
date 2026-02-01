@@ -1,7 +1,6 @@
 <div class="home-container">
   <!-- HEADER -->
   <div class="header">
-    <!-- Logo clickeable para ver batería -->
     <img 
       src="/logo-alertavision.png" 
       class="logo clickable" 
@@ -28,67 +27,68 @@
     </div>
   </div>
 
-  <!-- SALUDO -->
+  <!-- SALUDO CON NOMBRE REAL -->
   <h1 class="greeting">
     ¡Hola {{ userName }}! <br />
-    vamos a conducir juntos
+    Vamos a conducir juntos
   </h1>
 
-  <!-- TARJETA DETECTANDO FATIGAS -->
+  <!-- TARJETA ESTADO DE CONEXIÓN -->
   <div class="status-card glow-border">
-    <h2>Detectando fatigas</h2>
-    <p class="subtitle">Mantén la concentración</p>
+    <!-- Estado conectado -->
+    <div class="connection-status" *ngIf="lentesConectados">
+      <div class="status-indicator connected">
+        <span class="status-dot"></span>
+        <span>Lentes conectados</span>
+      </div>
+      
+      <!-- Batería -->
+      <div class="battery-display">
+        <div class="battery-icon-wrapper" [class.low]="batteryLevel <= 20" [class.critical]="batteryLevel <= 5">
+          <span class="battery-emoji">{{ getBatteryIcon() }}</span>
+          <span class="battery-percent">{{ batteryLevel }}%</span>
+        </div>
+        <div class="battery-bar">
+          <div class="battery-fill" 
+               [style.width.%]="batteryLevel" 
+               [style.background]="getBatteryColor()">
+          </div>
+        </div>
+      </div>
 
-    <div class="progress-bar-container">
-      <div class="progress-bar-fill" [style.width.%]="fatigaLevel"></div>
-      <span class="progress-label">{{ fatigaLevel }}%</span>
+      <!-- Alerta batería baja -->
+      <div class="low-battery-warning" *ngIf="batteryLevel <= 5">
+        ⚠️ ¡Batería crítica! Los lentes se pueden apagar
+      </div>
     </div>
 
-    <button class="action-btn" (click)="onStartMonitoring()">
-      Iniciar monitoreo
-    </button>
-    <p class="subtitle-small">Conecta tus lentes para iniciar</p>
-  </div>
-
-  <!-- TARJETA ESTADO DE LOS LENTES -->
-  <div class="status-card">
-    <h2 *ngIf="!lentesConectados">No se detectan los lentes</h2>
-    <h2 *ngIf="lentesConectados">✅ Lentes conectados</h2>
-
-    <!-- Mostrar batería si está conectado -->
-    <div class="battery-indicator" *ngIf="lentesConectados">
-      <span class="battery-icon">🔋</span>
-      <span class="battery-level" [style.color]="getBatteryColor()">
-        {{ batteryLevel }}%
-      </span>
+    <!-- Estado desconectado -->
+    <div class="connection-status" *ngIf="!lentesConectados">
+      <div class="status-indicator disconnected">
+        <span class="status-dot"></span>
+        <span>Lentes desconectados</span>
+      </div>
+      <p class="status-hint">Enciende tus lentes y acércalos para vincular</p>
     </div>
 
-    <p class="subtitle" *ngIf="!lentesConectados">
-      Enciende tus lentes y acércalos para vincular.
-    </p>
-    <p class="subtitle" *ngIf="lentesConectados">
-      Tus lentes están vinculados a este usuario. Puedes iniciar el monitoreo.
-    </p>
-
-    <div class="button-group">
-      <button
-        class="action-btn secondary"
-        (click)="onRetry()"
-        [disabled]="conectandoLentes"
-      >
-        {{ conectandoLentes ? 'Conectando...' : 'Reintentar' }}
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+      <button 
+        class="btn-connect" 
+        (click)="onConnectLenses()"
+        [disabled]="conectandoLentes">
+        <span *ngIf="!conectandoLentes">
+          {{ lentesConectados ? '🔄 Reconectar' : '🔗 Conectar lentes' }}
+        </span>
+        <span *ngIf="conectandoLentes">Conectando...</span>
       </button>
 
-      <button
-        class="action-btn primary"
-        (click)="onConnectLenses()"
-        [disabled]="conectandoLentes"
-      >
-        {{
-          conectandoLentes
-            ? 'Conectando...'
-            : (lentesConectados ? 'Reconectar' : 'Conectar')
-        }}
+      <!-- Botón silenciar alarma (solo visible si hay alarma activa) -->
+      <button 
+        class="btn-silence" 
+        *ngIf="alarmaActiva"
+        (click)="silenciarAlarma()">
+        🔇 Silenciar alarma
       </button>
     </div>
 
@@ -96,136 +96,128 @@
       {{ errorConexionLentes }}
     </p>
   </div>
+
+  <!-- TARJETA DETECTANDO FATIGAS -->
+  <div class="monitor-card" *ngIf="lentesConectados">
+    <div class="monitor-header">
+      <span class="monitor-icon">👁️</span>
+      <h2>Detectando fatigas</h2>
+    </div>
+    <p class="monitor-subtitle">Mantén la concentración</p>
+    
+    <div class="monitor-bar">
+      <div class="monitor-fill" [style.width.%]="fatigaLevel"></div>
+    </div>
+    <span class="monitor-status">{{ fatigaLevel }}% activo</span>
+  </div>
+
+  <!-- ESTADÍSTICAS RÁPIDAS -->
+  <div class="quick-stats" *ngIf="lentesConectados">
+    <div class="stat-card">
+      <span class="stat-value">{{ alertasHoy }}</span>
+      <span class="stat-label">Alertas hoy</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ tiempoConduccion }}</span>
+      <span class="stat-label">Tiempo activo</span>
+    </div>
+  </div>
 </div>
 
 <!-- NAV INFERIOR -->
 <nav class="bottom-nav">
   <div class="nav-btn active" (click)="goTo('home')">
-    <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" /><span
-      >Inicio</span
-    >
+    <img src="/fluent-color--home-32.svg" alt="Inicio" class="nav-icon" />
+    <span>Inicio</span>
   </div>
   <div class="nav-btn" (click)="goTo('history')">
-    <img
-      src="/icon-park--history-query.svg"
-      alt="Alertas"
-      class="nav-icon"
-    /><span>Alertas</span>
+    <img src="/icon-park--history-query.svg" alt="Alertas" class="nav-icon" />
+    <span>Alertas</span>
   </div>
   <div class="nav-btn" (click)="goTo('reports')">
-    <img
-      src="/iconoir--reports-solid.svg"
-      alt="Reportes"
-      class="nav-icon"
-    /><span>Reportes</span>
+    <img src="/iconoir--reports-solid.svg" alt="Reportes" class="nav-icon" />
+    <span>Informes</span>
   </div>
 </nav>
 
 <!-- MODAL BATERÍA -->
-<div class="battery-backdrop" *ngIf="showBatteryModal" (click)="closeBatteryModal()"></div>
+<div class="modal-backdrop" *ngIf="showBatteryModal" (click)="closeBatteryModal()"></div>
 
 <div class="battery-modal" *ngIf="showBatteryModal">
-  <div class="battery-modal-header">
+  <div class="modal-header">
     <h3>🔋 Estado de los Lentes</h3>
     <button class="close-btn" (click)="closeBatteryModal()">✕</button>
   </div>
 
-  <div class="battery-modal-body">
-    <!-- Loading -->
-    <div *ngIf="batteryLoading" class="battery-loading">
-      <div class="spinner"></div>
-      <p>Obteniendo estado...</p>
+  <div class="modal-body">
+    <div class="battery-big" [style.color]="getBatteryColor()">
+      <span class="battery-icon-big">{{ getBatteryIcon() }}</span>
+      <span class="battery-value">{{ batteryLevel }}%</span>
     </div>
 
-    <!-- Error -->
-    <div *ngIf="!batteryLoading && batteryError" class="battery-error">
-      <span>❌</span>
-      <p>{{ batteryError }}</p>
+    <div class="battery-bar-large">
+      <div class="battery-fill-large" 
+           [style.width.%]="batteryLevel"
+           [style.background]="getBatteryColor()">
+      </div>
     </div>
 
-    <!-- Datos -->
-    <div *ngIf="!batteryLoading && !batteryError" class="battery-content">
-      <div class="battery-big" [style.color]="getBatteryColor()">
-        <span class="battery-icon-big">{{ getBatteryIcon() }}</span>
-        <span class="battery-value">{{ batteryLevel }}%</span>
+    <div class="status-info">
+      <div class="info-row">
+        <span class="info-label">Estado:</span>
+        <span class="info-value" [class.connected]="lentesConectados">
+          {{ lentesConectados ? '✅ Conectados' : '❌ Desconectados' }}
+        </span>
       </div>
-
-      <div class="battery-status">
-        <div class="status-row">
-          <span class="label">Estado:</span>
-          <span class="value" [class.connected]="lentesConectados" [class.disconnected]="!lentesConectados">
-            {{ lentesConectados ? '✅ Conectados' : '❌ Desconectados' }}
-          </span>
-        </div>
-        <div class="status-row" *ngIf="lastBatteryUpdate">
-          <span class="label">Última actualización:</span>
-          <span class="value">{{ lastBatteryUpdate }}</span>
-        </div>
+      <div class="info-row" *ngIf="lastBatteryUpdate">
+        <span class="info-label">Actualizado:</span>
+        <span class="info-value">{{ lastBatteryUpdate }}</span>
       </div>
+    </div>
 
-      <div class="battery-bar-container">
-        <div class="battery-bar-fill" 
-             [style.width.%]="batteryLevel"
-             [style.background]="getBatteryColor()">
-        </div>
-      </div>
-
-      <p class="battery-tip" *ngIf="batteryLevel <= 20">
-        ⚠️ Batería baja. Considera cargar tus lentes.
-      </p>
+    <div class="battery-warning" *ngIf="batteryLevel <= 20">
+      ⚠️ Batería baja. Carga tus lentes pronto.
     </div>
   </div>
 
-  <div class="battery-modal-footer">
-    <button class="btn-refresh" (click)="fetchBatteryLevel()">
-      🔄 Actualizar
-    </button>
-    <button class="btn-close" (click)="closeBatteryModal()">
-      Cerrar
-    </button>
+  <div class="modal-footer">
+    <button class="btn-refresh" (click)="fetchBatteryLevel()">🔄 Actualizar</button>
+    <button class="btn-close" (click)="closeBatteryModal()">Cerrar</button>
   </div>
 </div>
 
 <!-- MODAL PERFIL -->
-<div class="profile-backdrop" *ngIf="showProfileModal" (click)="toggleProfile()"></div>
+<div class="modal-backdrop" *ngIf="showProfileModal" (click)="toggleProfile()"></div>
 
 <div class="profile-modal" *ngIf="showProfileModal">
-  <div class="profile-header">
-    <div class="avatar-large">{{ userName.charAt(0) | uppercase }}</div>
-    <div class="header-info">
+  <div class="modal-header">
+    <div class="profile-avatar">{{ userName.charAt(0) | uppercase }}</div>
+    <div class="profile-info">
       <h3>{{ userName }}</h3>
       <p>{{ userEmail }}</p>
     </div>
     <button class="close-btn" (click)="toggleProfile()">✕</button>
   </div>
 
-  <div class="profile-body">
+  <div class="modal-body">
     <div class="form-group">
-      <label>Nombre de Usuario</label>
+      <label>Nombre</label>
       <input type="text" [(ngModel)]="editData.nombre" placeholder="Tu nombre" />
     </div>
 
     <div class="form-group">
       <label>Teléfono</label>
-      <input
-        type="text"
-        [(ngModel)]="editData.telefono"
-        placeholder="Ej: 099..."
-      />
+      <input type="text" [(ngModel)]="editData.telefono" placeholder="Ej: 099..." />
     </div>
 
     <div class="form-group">
       <label>Correo de Recuperación</label>
-      <input
-        type="email"
-        [(ngModel)]="editData.email_recuperacion"
-        placeholder="respaldo@gmail.com"
-      />
+      <input type="email" [(ngModel)]="editData.email_recuperacion" placeholder="respaldo@gmail.com" />
     </div>
   </div>
 
-  <div class="profile-footer">
+  <div class="modal-footer">
     <button class="btn-cancel" (click)="toggleProfile()">Cancelar</button>
-    <button class="btn-save" (click)="saveProfile()">Guardar Cambios</button>
+    <button class="btn-save" (click)="saveProfile()">Guardar</button>
   </div>
 </div>
